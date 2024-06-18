@@ -1,0 +1,8 @@
+//
+// Created by itshu on 18/6/2024.
+//
+
+#ifndef CEDAR_CORE_THREADING_THREAD_H
+#define CEDAR_CORE_THREADING_THREAD_H
+
+#endif //CEDAR_CORE_THREADING_THREAD_H

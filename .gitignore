@@ -1,0 +1,116 @@
+# General files
+.DS_Store
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.old
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+*.mod*
+
+# CLion specific
+.idea/
+cmake-build-debug/
+cmake-build-release/
+cmake-build-relwithdebinfo/
+cmake-build-minsizerel/
+# Uncomment if you use other build directories
+# cmake-build-*/
+*.iml
+
+# CMake specific
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+CMakeScripts/
+CMakeTmp/
+cmake.log
+CMakeError.log
+CMakeLists.txt.user
+cmake_example/
+
+# QtCreator specific
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+*.obj
+*.autosave
+
+# QtCtreator directory
+.idea/
+
+# QtCtreator CMake directory
+.qtc_clangd/
+
+# QtCtreator project files
+*.pro.user*
+*.cxx*
+*.cppmake*
+
+# QtCreator qml files
+.qmake.stash
+*.qmake.cache
+
+# Windows specific
+Thumbs.db
+*.bak
+*.bak2
+*~
+
+# macOS specific
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Directories
+*/Debug/
+*/Release/
+*/build/
+
+# CLion specific
+.cmake/
+*.user/
+.idea/
+.vscode/
+
+# Ignore the CLion cmake output
+cmake-build-*/

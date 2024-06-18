@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.29)
+project(Cedar VERSION 0.1 DESCRIPTION "Cedar Core")
+set(CMAKE_CXX_STANDARD 20)
+include_directories(./include)
+add_library(Cedar STATIC "")
+add_subdirectory(src)
+target_link_libraries(Cedar PUBLIC pthread)
+add_subdirectory(test)

@@ -1,0 +1,5 @@
+Checks: '-*,google-*,-google-runtime-references,-cert-err60-cpp'
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+FormatStyle: none
