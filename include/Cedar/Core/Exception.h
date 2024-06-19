@@ -5,18 +5,25 @@
 #ifndef CEDAR_CORE_EXCEPTION_H
 #define CEDAR_CORE_EXCEPTION_H
 
-#include <Cedar/Core/String.h>
+#include <exception>
 
 namespace Cedar::Core {
-    class Exception {
+    class String;
+
+    class Exception : public std::exception {
     public:
-        explicit Exception(const String& message);
+        explicit Exception(const String &message);
+
         ~Exception();
 
-        String what() const noexcept;
+        String getMessage() const noexcept;
+
+        const char *what() const noexcept override;
+
     private:
         class Impl;
-        Impl* pImpl;
+
+        Impl *pImpl;
     };
 }
 

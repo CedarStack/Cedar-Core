@@ -8,10 +8,10 @@
 #include <Cedar/Core/BasicTypes.h>
 
 namespace Cedar::Core::Memory {
-    void copyMemory(Pointer target, Pointer source, Size size);
+    void copy(Pointer target, Pointer source, Size size);
     void copyCString(CString target, CString source);
     Size calcCStringLength(CString string);
-
+    Int32 compare(Pointer p1, Pointer p2, Size size);
     Pointer allocate(Size size);
     void release(Pointer pointer);
 

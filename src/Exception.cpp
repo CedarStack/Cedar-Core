@@ -4,6 +4,7 @@
 
 #include <Cedar/Core/Exception.h>
 #include <Cedar/Core/Memory.h>
+#include <Cedar/Core/String.h>
 
 using namespace Cedar::Core;
 
@@ -20,6 +21,10 @@ Exception::~Exception() {
     delete pImpl;
 }
 
-String Exception::what() const noexcept {
+String Exception::getMessage() const noexcept {
     return pImpl->message;
+}
+
+const char* Exception::what() const noexcept {
+    return pImpl->message.rawString();
 }

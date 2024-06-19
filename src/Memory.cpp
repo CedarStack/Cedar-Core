@@ -9,8 +9,12 @@
 
 using namespace Cedar::Core;
 
-void Memory::copyMemory(Cedar::Core::Pointer target, Cedar::Core::Pointer source, Cedar::Core::Size size) {
+void Memory::copy(Cedar::Core::Pointer target, Cedar::Core::Pointer source, Cedar::Core::Size size) {
     memcpy(target, source, size);
+}
+
+Int32 Memory::compare(Pointer p1, Pointer p2, Size size) {
+    return memcmp(p1, p2, size);
 }
 
 void Memory::copyCString(Cedar::Core::CString target, Cedar::Core::CString source) {

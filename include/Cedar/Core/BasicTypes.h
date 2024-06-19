@@ -23,7 +23,7 @@ namespace Cedar::Core {
     using Boolean = bool;
 
     using Byte = unsigned char;
-    using Rune = unsigned int;
+    using Rune = char32_t;
 
     using CString = const char*;
     using Pointer = void*;

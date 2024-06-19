@@ -114,7 +114,7 @@ namespace Cedar::Core::Container {
             ListNode<T>* node = getNodeAt(index);
             if (node == nullptr) {
                 mtx.unlock();
-                throw OutOfRangeException(String("Index out of range"));
+                throw OutOfRangeException("Index out of range");
             }
             T& value = node->value;
             mtx.unlock();
@@ -126,7 +126,7 @@ namespace Cedar::Core::Container {
             ListNode<T>* node = getNodeAt(index);
             if (node == nullptr) {
                 mtx.unlock();
-                throw OutOfRangeException(String("Index out of range"));
+                throw OutOfRangeException("Index out of range");
             }
             const T& value = node->value;
             mtx.unlock();

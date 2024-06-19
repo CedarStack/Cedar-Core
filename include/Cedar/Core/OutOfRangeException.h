@@ -8,7 +8,7 @@
 #include <Cedar/Core/Exception.h>
 
 namespace Cedar::Core {
-    class OutOfRangeException: Exception {
+    class OutOfRangeException: public Exception {
     public:
         explicit OutOfRangeException(const String& message): Exception(message) {}
     };

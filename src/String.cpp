@@ -1,23 +1,20 @@
-//
-// Created by itshu on 18/6/2024.
-//
-
 #include <Cedar/Core/String.h>
 #include <Cedar/Core/Memory.h>
+#include <Cedar/Core/Container/List.h>
 
 using namespace Cedar::Core;
-//using namespace Cedar::Core::Container;
+using namespace Cedar::Core::Container;
 
 struct String::Impl {
     Byte* data;
     Size size;
 
-    Impl(): data(nullptr), size(0) {}
+    Impl() : data(nullptr), size(0) {}
 
     explicit Impl(CString str) {
         if (str) {
             size = Memory::calcCStringLength(str);
-            data = static_cast<Byte *>(Memory::allocate(size + 1));
+            data = static_cast<Byte*>(Memory::allocate(size + 1));
             Memory::copyCString(reinterpret_cast<CString>(data), str);
         } else {
             size = 0;
@@ -28,11 +25,23 @@ struct String::Impl {
     Impl(const Impl& other) {
         if (other.data) {
             size = other.size;
-            data = static_cast<Byte *>(Memory::allocate(size + 1));
+            data = static_cast<Byte*>(Memory::allocate(size + 1));
             Memory::copyCString(reinterpret_cast<CString>(data), reinterpret_cast<CString>(other.data));
         } else {
             data = nullptr;
             size = 0;
+        }
+    }
+
+    explicit Impl(CString str, Size len) {
+        if (str) {
+            size = len;
+            data = static_cast<Byte*>(Memory::allocate(size + 1));
+            Memory::copy(data, (Pointer) str, size);
+            data[size] = '\0'; // Ensure null termination
+        } else {
+            size = 0;
+            data = nullptr;
         }
     }
 
@@ -42,8 +51,11 @@ struct String::Impl {
 
     Impl& operator=(const Impl& other) {
         if (this != &other) {
-            Byte* newData = new Byte[other.size + 1];
-            Memory::copyCString(reinterpret_cast<CString>(data), reinterpret_cast<CString>(other.data));
+            Byte* newData = nullptr;
+            if (other.data) {
+                newData = static_cast<Byte*>(Memory::allocate(other.size + 1));
+                Memory::copyCString(reinterpret_cast<CString>(newData), reinterpret_cast<CString>(other.data));
+            }
             Memory::release(data);
             data = newData;
             size = other.size;
@@ -76,11 +88,60 @@ struct String::Impl {
 
         return rune;
     }
+
+    static Size calcCStringLength(const char* str) {
+        Size len = 0;
+        while (str[len] != '\0') {
+            len++;
+        }
+        return len;
+    }
+
+    static void copyCString(char* dest, const char* src) {
+        while ((*dest++ = *src++));
+    }
+
+    List<String> split(const String& delimiter) const {
+        List<String> result;
+        Size delimiterLength = delimiter.pImpl->size;
+        if (delimiterLength == 0) {
+            result.append(String(reinterpret_cast<const char*>(data), size));
+            return result;
+        }
+
+        const Byte* start = data;
+        const Byte* end = data + size;
+        const Byte* current = start;
+
+        while (current < end) {
+            const Byte* found = nullptr;
+            for (Size i = 0; i <= (end - current - delimiterLength); ++i) {
+                if (Memory::compare((Pointer) reinterpret_cast<CString>(current + i),
+                                    (Pointer) reinterpret_cast<CString>(delimiter.pImpl->data), delimiterLength) == 0) {
+                    found = current + i;
+                    break;
+                }
+            }
+
+            if (found) {
+                Size segmentSize = found - current;
+                result.append(String(reinterpret_cast<CString>(current), segmentSize));
+                current = found + delimiterLength;
+            } else {
+                result.append(String(reinterpret_cast<CString>(current), end - current));
+                break;
+            }
+        }
+
+        return result;
+    }
 };
 
 String::String() : pImpl(new Impl()) {}
 
 String::String(const char* str) : pImpl(new Impl(str)) {}
+
+String::String(CString str, Size len) : pImpl(new Impl(str, len)) {}
 
 String::String(const String& other) : pImpl(new Impl(*other.pImpl)) {}
 
@@ -99,12 +160,19 @@ String& String::operator=(const String& other) {
     return *this;
 }
 
-Rune String::operator[](Index index) const {
-    return this->at(index);
+String& String::operator=(String&& other) noexcept {
+    if (this != &other) {
+        delete pImpl;
+        pImpl = other.pImpl;
+        other.pImpl = nullptr;
+    }
+    return *this;
 }
 
 Rune String::at(Index index) const {
-    if (!pImpl->data || index >= pImpl->size) return 0; // Return 0 for out of range
+    if (!pImpl->data || index >= pImpl->size) {
+        throw OutOfRangeException("Out of range");
+    }
 
     Size charCount = 0;
     Size i = 0;
@@ -112,9 +180,40 @@ Rune String::at(Index index) const {
         if (charCount == index) {
             return pImpl->decodeRuneAt(i);
         }
-        i += Cedar::Core::String::Impl::bytesInRune(pImpl->data[i]);
+        i += Impl::bytesInRune(pImpl->data[i]);
         charCount++;
     }
 
     return 0;
+}
+
+Rune String::operator[](Index index) const {
+    return this->at(index);
+}
+
+CString String::rawString() const noexcept {
+    return pImpl != nullptr ?
+        reinterpret_cast<CString>(pImpl->data) : nullptr;
+}
+
+List<String> String::split(const String& delimiter) const {
+    return pImpl->split(delimiter);
+}
+
+String String::operator+(const String& other) const {
+    Size newSize = this->pImpl->size + other.pImpl->size;
+    Byte* newData = static_cast<Byte*>(Memory::allocate(newSize + 1));
+    Memory::copy(newData, this->pImpl->data, this->pImpl->size);
+    Memory::copy(newData + this->pImpl->size, other.pImpl->data, other.pImpl->size);
+    newData[newSize] = '\0';
+    return String(reinterpret_cast<CString>(newData), newSize);
+}
+
+bool String::operator==(const String& other) const {
+    return this->pImpl->size == other.pImpl->size &&
+           Memory::compare(this->pImpl->data, other.pImpl->data, this->pImpl->size) == 0;
+}
+
+bool String::operator!=(const String& other) const {
+    return !(*this == other);
 }
