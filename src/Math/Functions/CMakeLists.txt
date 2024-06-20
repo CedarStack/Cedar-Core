@@ -2,4 +2,11 @@
 # This file is part of Cedar-Core, distributed under the MIT License.
 # See the LICENSE file in the project root for full license information.
 
-add_subdirectory(Functions)
+target_sources(Cedar PRIVATE
+        Abs.cpp
+        Ceil.cpp
+        Float.cpp
+        Floor.cpp
+        Round.cpp
+        Sqrt.cpp
+)

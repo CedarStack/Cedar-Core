@@ -23,8 +23,6 @@
 
 #include <Cedar/Core/Math/MathFunctions.h>
 
-#include "RSqrtTable.h"
-
 using namespace Cedar::Core;
 using namespace Cedar::Core::Math;
 
@@ -54,12 +52,22 @@ Float64 Math::Inf<Float64>() {
 
 template<>
 Float32 Math::Epsilon<Float32>() {
-    return 1.1920928955078125e-07F;
+    return 1.1920928955078125e-07f;
 }
 
 template<>
 Float64 Math::Epsilon<Float64>() {
     return 2.2204460492503131e-16;
+}
+
+template<>
+Float32 Math::SmallestNormal<Float32>() {
+    return 1.17549435e-38f;
+}
+
+template<>
+Float64 Math::SmallestNormal<Float64>() {
+    return 2.2250738585072014e-308;
 }
 
 Boolean Math::isNaN(Float32 value) {
@@ -156,168 +164,4 @@ FractionalParts<Float64> Math::splitFractional(Float64 value) {
     result.integerPart = u.floatValue;
     result.fractionalPart = value - u.floatValue;
     return result;
-}
-
-Float32 Math::floor(Float32 value) {
-    if (isNaN(value) || isInf(value)) {
-        return value;
-    }
-
-    auto parts = splitFractional(value);
-    if (parts.fractionalPart < 0) {
-        parts.integerPart -= 1.0f;
-    }
-    return parts.integerPart;
-}
-
-Float64 Math::floor(Float64 value) {
-    if (isNaN(value) || isInf(value)) {
-        return value;
-    }
-
-    auto parts = splitFractional(value);
-    if (parts.fractionalPart < 0) {
-        parts.integerPart -= 1.0;
-    }
-    return parts.integerPart;
-}
-
-Float32 Math::ceil(Float32 value) {
-    if (isNaN(value) || isInf(value)) {
-        return value;
-    }
-
-    auto parts = splitFractional(value);
-    if (parts.fractionalPart > 0) {
-        parts.integerPart += 1.0f;
-    }
-    return parts.integerPart;
-}
-
-Float64 Math::ceil(Float64 value) {
-    if (isNaN(value) || isInf(value)) {
-        return value;
-    }
-
-    auto parts = splitFractional(value);
-    if (parts.fractionalPart > 0) {
-        parts.integerPart += 1.0;
-    }
-    return parts.integerPart;
-}
-
-Float32 round(Float32 value) {
-    if (isNaN(value) || isInf(value)) {
-        return value;
-    }
-
-    auto parts = splitFractional(value);
-    if (value > 0.0f) {
-        if (parts.fractionalPart >= 0.5f) {
-            parts.integerPart += 1.0f;
-        }
-    } else {
-        if (parts.fractionalPart <= -0.5f) {
-            parts.integerPart -= 1.0f;
-        }
-    }
-    return parts.integerPart;
-}
-
-Float64 Math::round(Float64 value) {
-    if (isNaN(value) || isInf(value)) {
-        return value;
-    }
-
-    auto parts = splitFractional(value);
-    if (value > 0.0) {
-        if (parts.fractionalPart >= 0.5) {
-            parts.integerPart += 1.0;
-        }
-    } else {
-        if (parts.fractionalPart <= -0.5) {
-            parts.integerPart -= 1.0;
-        }
-    }
-    return parts.integerPart;
-}
-
-Int32 Math::abs(Int32 value) {
-    return value < 0 ? -value : value;
-}
-
-Int64 Math::abs(Int64 value) {
-    return value < 0 ? -value : value;
-}
-
-Float32 Math::abs(Float32 value) {
-    return value < 0 ? -value : value;
-}
-
-Float64 Math::abs(Float64 value) {
-    return value < 0 ? -value : value;
-}
-
-static inline UInt32 mul32(UInt32 a, UInt32 b) {
-    return static_cast<UInt64>(a) * b >> 32;
-}
-
-static inline UInt64 mul64(UInt64 a, UInt64 b) {
-    UInt64 ahi = a >> 32;
-    UInt64 alo = a & 0xffffffff;
-    UInt64 bhi = b >> 32;
-    UInt64 blo = b & 0xffffffff;
-    return ahi * bhi + (ahi * blo >> 32) + (alo * bhi >> 32);
-}
-
-Float64 Math::sqrt(Float64 value) {
-    constexpr UInt64 multiplier = 0xc0000000;
-
-    UInt64 bits = *reinterpret_cast<UInt64*>(&value);
-    UInt64 exponent = bits >> 52;
-
-    if (exponent - 0x001 >= 0x7ff - 0x001) {
-        if (bits * 2 == 0 || bits == 0x7ff0000000000000) {
-            return value;
-        }
-        if (bits > 0x7ff0000000000000) {
-            return NaN<Float64>();
-        }
-
-        Float64 temp = value * 0x1p52;
-        bits = *reinterpret_cast<UInt64*>(&temp);
-        exponent = bits >> 52;
-        exponent -= 52;
-    }
-
-    Int32 isOdd = (Int32) exponent & 1;
-    UInt64 mantissa = (bits << 11) | 0x8000000000000000;
-    if (isOdd) mantissa >>= 1;
-    exponent = (exponent + 0x3ff) >> 1;
-
-    UInt64 initialGuess = static_cast<UInt32>(RSqrtTable[(bits >> 46) % 128]) << 16;
-    UInt64 scaledValue = mul32(mantissa >> 32, initialGuess);
-    UInt64 approximation = mul32(scaledValue, initialGuess);
-    UInt64 correction = multiplier - approximation;
-    initialGuess = mul32(initialGuess, correction) << 1;
-    scaledValue = mul32(scaledValue, correction) << 1;
-
-    approximation = mul32(scaledValue, initialGuess);
-    correction = multiplier - approximation;
-    initialGuess = mul32(initialGuess, correction) << 1;
-    initialGuess = initialGuess << 32;
-    scaledValue = mul64(mantissa, initialGuess);
-    approximation = mul64(scaledValue, initialGuess);
-    correction = (multiplier << 32) - approximation;
-    scaledValue = mul64(scaledValue, correction);
-
-    scaledValue = (scaledValue - 2) >> 9;
-    UInt64 residual = (mantissa << 42) - scaledValue * scaledValue;
-    UInt64 adjustment = scaledValue - residual;
-
-    scaledValue += adjustment >> 63;
-    scaledValue &= 0x000fffffffffffff;
-    scaledValue |= exponent << 52;
-
-    return *reinterpret_cast<Float64*>(&scaledValue);
 }

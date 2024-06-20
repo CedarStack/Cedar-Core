@@ -27,7 +27,6 @@
 
 namespace Cedar::Core::Math {
     constexpr Float64 PI = 3.14159265358979323846;
-
     constexpr Float64 EulerNumber = 2.71828182845904523536;
     constexpr Float64 Sqrt2 = 1.41421356237309504880;
     constexpr Float64 Sqrt1_2 = 0.70710678118654752440;
@@ -61,6 +60,9 @@ namespace Cedar::Core::Math {
 
     template<typename T>
     T Epsilon();
+
+    template<typename T>
+    T SmallestNormal();
 
     Boolean isNaN(Float32 value);
     Boolean isNaN(Float64 value);
