@@ -3,10 +3,5 @@
 # See the LICENSE file in the project root for full license information.
 
 target_sources(Cedar PRIVATE
-        Exception.cpp
-        String.cpp
-        Memory.cpp
+        MathFunctions.cpp
 )
-
-add_subdirectory(Threading)
-add_subdirectory(Math)

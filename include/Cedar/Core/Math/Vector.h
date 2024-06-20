@@ -24,118 +24,138 @@
 #pragma once
 
 #include <Cedar/Core/BasicTypes.h>
-#include <cmath>
+#include <Cedar/Core/Math/MathFunctions.h>
 
 namespace Cedar::Core::Math {
-
     template<typename T, Size S>
     class Vector {
-    private:
-        T Arr[S]{};
-
-        UInt32 Counter = 0;
-
     public:
         Vector() = default;
 
         explicit Vector(T value) {
             for (Index i = 0; i < S; ++i) {
-                Arr[i] = value;
+                m_array[i] = value;
             }
         }
 
         template<typename... T1>
         explicit Vector(T1... values) {
-            auto InitFun = [this](T &v) {
-                Arr[Counter] = v;
-                Counter++;
-            };
-            ((InitFun(values)), ...);
-            Counter = 0;
+            static_assert(sizeof...(values) == S, "Number of arguments must match the vector size");
+            T initList[] = { values... };
+            for (Index i = 0; i < S; ++i) {
+                m_array[i] = initList[i];
+            }
         }
 
-        T operator[](Index index) {
+        T operator[](Index index) const {
             if (index >= S) {
                 throw OutOfRangeException("Index out of range");
             }
-            return Arr[index];
+            return m_array[index];
         }
 
-        Vector operator+() {
-            for (Index i = 0; i < S; ++i) {
-                Arr[i] = abs(Arr[i]);
+        T& operator[](Index index) {
+            if (index >= S) {
+                throw OutOfRangeException("Index out of range");
             }
+            return m_array[index];
+        }
+
+        Vector operator+() const {
+            Vector result = *this;
+            for (Index i = 0; i < S; ++i) {
+                result.m_array[i] = std::abs(m_array[i]);
+            }
+            return result;
+        }
+
+        Vector operator-() const {
+            Vector result;
+            for (Index i = 0; i < S; ++i) {
+                result.m_array[i] = -m_array[i];
+            }
+            return result;
+        }
+
+        Vector operator+(const Vector &v) const {
+            Vector result = *this;
+            for (Index i = 0; i < S; ++i) {
+                result.m_array[i] += v.m_array[i];
+            }
+            return result;
+        }
+
+        Vector operator-(const Vector &v) const {
+            Vector result = *this;
+            for (Index i = 0; i < S; ++i) {
+                result.m_array[i] -= v.m_array[i];
+            }
+            return result;
+        }
+
+        Vector operator*(const Vector &v) const {
+            Vector result = *this;
+            for (Index i = 0; i < S; ++i) {
+                result.m_array[i] *= v.m_array[i];
+            }
+            return result;
+        }
+
+        Vector operator/(const Vector &v) const {
+            Vector result = *this;
+            for (Index i = 0; i < S; ++i) {
+                result.m_array[i] /= v.m_array[i];
+            }
+            return result;
+        }
+
+        Vector& operator+=(const Vector &v) {
+            *this = *this + v;
             return *this;
         }
 
-        Vector operator-() {
-            for (Index i = 0; i < S; ++i) {
-                Arr[i] = -abs(Arr[i]);
-            }
+        Vector& operator-=(const Vector &v) {
+            *this = *this - v;
             return *this;
         }
 
-        Vector operator+(const Vector &v) {
-            Vector copy = *this;
-            for (Index i = 0; i < S; ++i) {
-                copy.Arr[i] += v.Arr[i];
-            }
-            return copy;
-        }
-
-        Vector operator-(const Vector &v) {
-            for (Index i = 0; i < S; ++i) {
-                this->Arr[i] -= v.Arr[i];
-            }
+        Vector& operator*=(const Vector &v) {
+            *this = *this * v;
             return *this;
         }
 
-        Vector operator*(const Vector &v) {
-            for (Index i = 0; i < S; ++i) {
-                this->Arr[i] *= v.Arr[i];
-            }
+        Vector& operator/=(const Vector &v) {
+            *this = *this / v;
             return *this;
         }
 
-        Vector operator/(const Vector &v) {
+        bool operator==(const Vector &v) const {
             for (Index i = 0; i < S; ++i) {
-                this->Arr[i] /= v.Arr[i];
+                if (m_array[i] != v.m_array[i]) {
+                    return false;
+                }
             }
-            return *this;
+            return true;
         }
 
-        Vector operator+=(const Vector &v) {
-            return this + v;
+        bool operator!=(const Vector &v) const {
+            // NOLINTNEXTLINE
+            return !(*this == v);
         }
 
-        Vector operator-=(const Vector &v) {
-            return this - v;
-        }
-
-        Vector operator*=(const Vector &v) {
-            return this * v;
-        }
-
-        Vector operator/=(const Vector &v) {
-            return this / v;
-        }
-
-        Boolean operator==(const Vector &v) {
-            Boolean isEqual = true;
+        T length() const {
+            T sum = 0;
             for (Index i = 0; i < S; ++i) {
-                if (this->Arr[i] != v.Arr[i]) { isEqual = false; } else { isEqual = true; }
+                sum += m_array[i] * m_array[i];
             }
-            return isEqual;
+            return Math::sqrt(sum);
         }
 
-        Boolean operator!=(const Vector &v) {
-            Boolean isEqual = true;
-            for (Index i = 0; i < S; ++i) {
-                if (this->Arr[i] != v.Arr[i]) { isEqual = false; } else { isEqual = true; }
-            }
-            return !isEqual;
+        static T distance(const Vector& v1, const Vector& v2) {
+            return (v1 - v2).length();
         }
-
+    private:
+        T m_array[S]{};
     };
 
     using Vec2f = Vector<Float32, 2>;

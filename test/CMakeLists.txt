@@ -15,7 +15,7 @@ FetchContent_MakeAvailable(googletest)
 #add_compile_options(-fsanitize=address)
 #link_libraries(-fsanitize=address)
 
-file(GLOB_RECURSE TEST_SOURCES "./*.cpp")
+file(GLOB_RECURSE TEST_SOURCES "*.cpp")
 
 foreach(test_source ${TEST_SOURCES})
     get_filename_component(test_name ${test_source} NAME_WE)
@@ -25,3 +25,4 @@ foreach(test_source ${TEST_SOURCES})
 endforeach()
 
 enable_testing()
+
