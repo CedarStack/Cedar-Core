@@ -48,11 +48,13 @@ namespace Cedar::Core {
 //    using Char = char;
 
 #if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = unsigned long long;
+    using SizeType = long long;
+    using USizeType = unsigned long long;
 #else
-    using SizeType = unsigned int;
+    using SizeType = int;
+    using USizeType = unsigned int;
 #endif
 
-    using Size = SizeType;
+    using Size = USizeType;
     using Index = SizeType;
 }
