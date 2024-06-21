@@ -81,6 +81,10 @@ namespace Cedar::Core {
          */
         ~String();
 
+        /**
+         * Get String length.
+         * @return Size value.
+         */
         [[nodiscard]] Size length() const;
 
         /**
