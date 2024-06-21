@@ -1,0 +1,404 @@
+\hypertarget{classCedar_1_1Core_1_1String}{}\doxysection{Cedar\+::Core\+::String Class Reference}
+\label{classCedar_1_1Core_1_1String}\index{Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String_a11af575e4546081306b1402a85779fb8}{String}} ()
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String_a7d61ce8446f725287e0a817d3e688ab7}{String}} (CString string)
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String_a32541516c43746ea079e66a20bce6383}{String}} (CString str, Size len)
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String_a37c0bc0af17ece99c01fef4605c480eb}{String}} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&other)
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String_a1080f11646328a4441045e680ff124b4}{String}} (\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&\&other) noexcept
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String_af4a7adc63388dc1640a87485e21231ae}{String}} (Rune rune)
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String_a51500b2517cc84e20f38c3af70a25337}{$\sim$\+String}} ()
+\item 
+Size \mbox{\hyperlink{classCedar_1_1Core_1_1String_a8726112366550b9b420fa289daf3de97}{length}} () const
+\item 
+Rune \mbox{\hyperlink{classCedar_1_1Core_1_1String_a348a74df784c9354a7cf77ac58f5b7d3}{at}} (Index index) const
+\item 
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_aa425a8039c688a8162e63c6cd835de27}\label{classCedar_1_1Core_1_1String_aa425a8039c688a8162e63c6cd835de27}} 
+Rune {\bfseries operator\mbox{[}$\,$\mbox{]}} (Index index) const
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \mbox{\hyperlink{classCedar_1_1Core_1_1String_afaf26faf5f30f64cb50a843f0ec8a0c3}{trim}} () const
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \mbox{\hyperlink{classCedar_1_1Core_1_1String_a78ba4a9017c1d8cf4682c3ba9c07d25d}{trim\+Start}} () const
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \mbox{\hyperlink{classCedar_1_1Core_1_1String_a61d862934ba1a22ff5f4c3c3252f97b3}{trim\+End}} () const
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \mbox{\hyperlink{classCedar_1_1Core_1_1String_afe90b4d2976834a9af69445bb9424f57}{strip\+Prefix}} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&prefix) const
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \mbox{\hyperlink{classCedar_1_1Core_1_1String_a7b0e2f709e7e34af450494a13397a896}{strip\+Suffix}} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&suffix) const
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \mbox{\hyperlink{classCedar_1_1Core_1_1String_a20fbcd7f6e45ad50f3e49d682338e6df}{substring}} (Size start, Size len=NPos) const
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \mbox{\hyperlink{classCedar_1_1Core_1_1String_ae4e0a4ca31690bbb4e21fbed8e868ee9}{replace}} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&old\+Str, const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&new\+Str) const
+\item 
+Boolean \mbox{\hyperlink{classCedar_1_1Core_1_1String_aa5e2039448a47a37025731957bc124b5}{contains}} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&\mbox{\hyperlink{classCedar_1_1Core_1_1String_a20fbcd7f6e45ad50f3e49d682338e6df}{substring}}) const
+\item 
+Boolean \mbox{\hyperlink{classCedar_1_1Core_1_1String_af27502e0ed381ab01fe1aba84265f090}{starts\+With}} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&prefix) const
+\item 
+Boolean \mbox{\hyperlink{classCedar_1_1Core_1_1String_a1cfc54f51e04f2d35a86170d7a81f90d}{ends\+With}} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&suffix) const
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1Container_1_1List}{Container\+::\+List}}$<$ \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} $>$ \mbox{\hyperlink{classCedar_1_1Core_1_1String_ae5bca53974230989aa2afb6a6dc1143d}{split}} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&delimiter) const
+\item 
+\mbox{\hyperlink{classCedar_1_1Core_1_1Container_1_1List}{Container\+::\+List}}$<$ \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} $>$ \mbox{\hyperlink{classCedar_1_1Core_1_1String_ae702d6e43b138e4e7ec43279c9005601}{get\+Lines}} () const
+\item 
+Index \mbox{\hyperlink{classCedar_1_1Core_1_1String_a6830976c9b1dbcac124a2021b7766339}{find}} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&\mbox{\hyperlink{classCedar_1_1Core_1_1String_a20fbcd7f6e45ad50f3e49d682338e6df}{substring}}, Index start\+Index=0) const
+\item 
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a880f31f0a74409c8dbeb8bd92787f304}\label{classCedar_1_1Core_1_1String_a880f31f0a74409c8dbeb8bd92787f304}} 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \& {\bfseries operator=} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&other)
+\item 
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a04d370ce680d18ed76812e7cd679fecb}\label{classCedar_1_1Core_1_1String_a04d370ce680d18ed76812e7cd679fecb}} 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \& {\bfseries operator=} (\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&\&other) noexcept
+\item 
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a59eebd12db4afb67c5eb068e8b45be7a}\label{classCedar_1_1Core_1_1String_a59eebd12db4afb67c5eb068e8b45be7a}} 
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} {\bfseries operator+} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&other) const
+\item 
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_aed03fe43b50d90c0f4da057d06f48502}\label{classCedar_1_1Core_1_1String_aed03fe43b50d90c0f4da057d06f48502}} 
+Boolean {\bfseries operator==} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&other) const
+\item 
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a5926b00550158a63a91e221c19e22cd9}\label{classCedar_1_1Core_1_1String_a5926b00550158a63a91e221c19e22cd9}} 
+Boolean {\bfseries operator!=} (const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&other) const
+\item 
+CString \mbox{\hyperlink{classCedar_1_1Core_1_1String_a0f7cccf1087ac6fdb1374f06545795d0}{raw\+String}} () const noexcept
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static Boolean \mbox{\hyperlink{classCedar_1_1Core_1_1String_ae199aaf2db5a54cf847fab2f0f811070}{is\+Whitespace}} (Rune rune)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a72a15cb135861af0dc0c2f2b93a30b78}\label{classCedar_1_1Core_1_1String_a72a15cb135861af0dc0c2f2b93a30b78}} 
+static const Index {\bfseries NPos} = -\/1
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a11af575e4546081306b1402a85779fb8}\label{classCedar_1_1Core_1_1String_a11af575e4546081306b1402a85779fb8}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!String@{String}}
+\index{String@{String}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily Cedar\+::\+Core\+::\+String\+::\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Default constructor. \mbox{\Hypertarget{classCedar_1_1Core_1_1String_a7d61ce8446f725287e0a817d3e688ab7}\label{classCedar_1_1Core_1_1String_a7d61ce8446f725287e0a817d3e688ab7}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!String@{String}}
+\index{String@{String}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily Cedar\+::\+Core\+::\+String\+::\+String (\begin{DoxyParamCaption}\item[{CString}]{string }\end{DoxyParamCaption})}
+
+constructor.
+
+
+\begin{DoxyParams}{Parameters}
+{\em string} & Text value, use Char$\ast$ as input. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a32541516c43746ea079e66a20bce6383}\label{classCedar_1_1Core_1_1String_a32541516c43746ea079e66a20bce6383}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!String@{String}}
+\index{String@{String}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily Cedar\+::\+Core\+::\+String\+::\+String (\begin{DoxyParamCaption}\item[{CString}]{str,  }\item[{Size}]{len }\end{DoxyParamCaption})}
+
+constructor. \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} length can be limited.
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & Text value. \\
+\hline
+{\em len} & A string length value, \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a37c0bc0af17ece99c01fef4605c480eb}\label{classCedar_1_1Core_1_1String_a37c0bc0af17ece99c01fef4605c480eb}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!String@{String}}
+\index{String@{String}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily Cedar\+::\+Core\+::\+String\+::\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&}]{other }\end{DoxyParamCaption})}
+
+constructor.
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & Text value, use \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} as input. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a1080f11646328a4441045e680ff124b4}\label{classCedar_1_1Core_1_1String_a1080f11646328a4441045e680ff124b4}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!String@{String}}
+\index{String@{String}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily Cedar\+::\+Core\+::\+String\+::\+String (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&\&}]{other }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+constructor.
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_af4a7adc63388dc1640a87485e21231ae}\label{classCedar_1_1Core_1_1String_af4a7adc63388dc1640a87485e21231ae}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!String@{String}}
+\index{String@{String}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily Cedar\+::\+Core\+::\+String\+::\+String (\begin{DoxyParamCaption}\item[{Rune}]{rune }\end{DoxyParamCaption})}
+
+constructor.
+
+
+\begin{DoxyParams}{Parameters}
+{\em rune} & Rune value, use Char as input. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a51500b2517cc84e20f38c3af70a25337}\label{classCedar_1_1Core_1_1String_a51500b2517cc84e20f38c3af70a25337}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!````~String@{$\sim$String}}
+\index{````~String@{$\sim$String}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{$\sim$String()}{~String()}}
+{\footnotesize\ttfamily Cedar\+::\+Core\+::\+String\+::$\sim$\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+analytic groove function. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a348a74df784c9354a7cf77ac58f5b7d3}\label{classCedar_1_1Core_1_1String_a348a74df784c9354a7cf77ac58f5b7d3}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!at@{at}}
+\index{at@{at}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{at()}{at()}}
+{\footnotesize\ttfamily Rune Cedar\+::\+Core\+::\+String\+::at (\begin{DoxyParamCaption}\item[{Index}]{index }\end{DoxyParamCaption}) const}
+
+Get the character at index.
+
+
+\begin{DoxyParams}{Parameters}
+{\em index} & Need character index. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A char vaule. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_aa5e2039448a47a37025731957bc124b5}\label{classCedar_1_1Core_1_1String_aa5e2039448a47a37025731957bc124b5}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!contains@{contains}}
+\index{contains@{contains}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{contains()}{contains()}}
+{\footnotesize\ttfamily Boolean Cedar\+::\+Core\+::\+String\+::contains (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&}]{substring }\end{DoxyParamCaption}) const}
+
+Is string in current string 
+\begin{DoxyParams}{Parameters}
+{\em substring} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} value. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a1cfc54f51e04f2d35a86170d7a81f90d}\label{classCedar_1_1Core_1_1String_a1cfc54f51e04f2d35a86170d7a81f90d}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!endsWith@{endsWith}}
+\index{endsWith@{endsWith}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{endsWith()}{endsWith()}}
+{\footnotesize\ttfamily Boolean Cedar\+::\+Core\+::\+String\+::ends\+With (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&}]{suffix }\end{DoxyParamCaption}) const}
+
+Is there string at current string tail.
+
+
+\begin{DoxyParams}{Parameters}
+{\em prefix} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} value. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a6830976c9b1dbcac124a2021b7766339}\label{classCedar_1_1Core_1_1String_a6830976c9b1dbcac124a2021b7766339}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!find@{find}}
+\index{find@{find}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{find()}{find()}}
+{\footnotesize\ttfamily Index Cedar\+::\+Core\+::\+String\+::find (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&}]{substring,  }\item[{Index}]{start\+Index = {\ttfamily 0} }\end{DoxyParamCaption}) const}
+
+Find string form start index. 
+\begin{DoxyParams}{Parameters}
+{\em substring} & \\
+\hline
+{\em start\+Index} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Index value. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_ae702d6e43b138e4e7ec43279c9005601}\label{classCedar_1_1Core_1_1String_ae702d6e43b138e4e7ec43279c9005601}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!getLines@{getLines}}
+\index{getLines@{getLines}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{getLines()}{getLines()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCedar_1_1Core_1_1Container_1_1List}{Container\+::\+List}}$<$\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}}$>$ Cedar\+::\+Core\+::\+String\+::get\+Lines (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Get all line as lines list. \begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} lines list. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_ae199aaf2db5a54cf847fab2f0f811070}\label{classCedar_1_1Core_1_1String_ae199aaf2db5a54cf847fab2f0f811070}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!isWhitespace@{isWhitespace}}
+\index{isWhitespace@{isWhitespace}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{isWhitespace()}{isWhitespace()}}
+{\footnotesize\ttfamily static Boolean Cedar\+::\+Core\+::\+String\+::is\+Whitespace (\begin{DoxyParamCaption}\item[{Rune}]{rune }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+Is white space in input Rune value. 
+\begin{DoxyParams}{Parameters}
+{\em rune} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a8726112366550b9b420fa289daf3de97}\label{classCedar_1_1Core_1_1String_a8726112366550b9b420fa289daf3de97}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!length@{length}}
+\index{length@{length}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{length()}{length()}}
+{\footnotesize\ttfamily Size Cedar\+::\+Core\+::\+String\+::length (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Get \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} length. \begin{DoxyReturn}{Returns}
+Size value. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a0f7cccf1087ac6fdb1374f06545795d0}\label{classCedar_1_1Core_1_1String_a0f7cccf1087ac6fdb1374f06545795d0}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!rawString@{rawString}}
+\index{rawString@{rawString}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{rawString()}{rawString()}}
+{\footnotesize\ttfamily CString Cedar\+::\+Core\+::\+String\+::raw\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} value to CString value. \begin{DoxyReturn}{Returns}
+Return CString value. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_ae4e0a4ca31690bbb4e21fbed8e868ee9}\label{classCedar_1_1Core_1_1String_ae4e0a4ca31690bbb4e21fbed8e868ee9}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!replace@{replace}}
+\index{replace@{replace}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{replace()}{replace()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} Cedar\+::\+Core\+::\+String\+::replace (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&}]{old\+Str,  }\item[{const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&}]{new\+Str }\end{DoxyParamCaption}) const}
+
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} replace.
+
+
+\begin{DoxyParams}{Parameters}
+{\em old\+Str} & \\
+\hline
+{\em new\+Str} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} value. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_ae5bca53974230989aa2afb6a6dc1143d}\label{classCedar_1_1Core_1_1String_ae5bca53974230989aa2afb6a6dc1143d}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!split@{split}}
+\index{split@{split}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{split()}{split()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCedar_1_1Core_1_1Container_1_1List}{Container\+::\+List}}$<$\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}}$>$ Cedar\+::\+Core\+::\+String\+::split (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&}]{delimiter }\end{DoxyParamCaption}) const}
+
+Split this \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}}, return some \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} values.
+
+
+\begin{DoxyParams}{Parameters}
+{\em delimiter} & \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} as delimiter. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} values. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_af27502e0ed381ab01fe1aba84265f090}\label{classCedar_1_1Core_1_1String_af27502e0ed381ab01fe1aba84265f090}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!startsWith@{startsWith}}
+\index{startsWith@{startsWith}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{startsWith()}{startsWith()}}
+{\footnotesize\ttfamily Boolean Cedar\+::\+Core\+::\+String\+::starts\+With (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&}]{prefix }\end{DoxyParamCaption}) const}
+
+Is there string at current string head.
+
+
+\begin{DoxyParams}{Parameters}
+{\em prefix} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} value. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_afe90b4d2976834a9af69445bb9424f57}\label{classCedar_1_1Core_1_1String_afe90b4d2976834a9af69445bb9424f57}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!stripPrefix@{stripPrefix}}
+\index{stripPrefix@{stripPrefix}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{stripPrefix()}{stripPrefix()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} Cedar\+::\+Core\+::\+String\+::strip\+Prefix (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&}]{prefix }\end{DoxyParamCaption}) const}
+
+The form head starts remove The string.
+
+
+\begin{DoxyParams}{Parameters}
+{\em prefix} & \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} to replace. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} value. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a7b0e2f709e7e34af450494a13397a896}\label{classCedar_1_1Core_1_1String_a7b0e2f709e7e34af450494a13397a896}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!stripSuffix@{stripSuffix}}
+\index{stripSuffix@{stripSuffix}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{stripSuffix()}{stripSuffix()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} Cedar\+::\+Core\+::\+String\+::strip\+Suffix (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} \&}]{suffix }\end{DoxyParamCaption}) const}
+
+The form tail starts remove The string.
+
+
+\begin{DoxyParams}{Parameters}
+{\em prefix} & \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} to replace. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} value. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a20fbcd7f6e45ad50f3e49d682338e6df}\label{classCedar_1_1Core_1_1String_a20fbcd7f6e45ad50f3e49d682338e6df}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!substring@{substring}}
+\index{substring@{substring}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{substring()}{substring()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} Cedar\+::\+Core\+::\+String\+::substring (\begin{DoxyParamCaption}\item[{Size}]{start,  }\item[{Size}]{len = {\ttfamily NPos} }\end{DoxyParamCaption}) const}
+
+Create a new sub string. 
+\begin{DoxyParams}{Parameters}
+{\em start} & \\
+\hline
+{\em len} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} value. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_afaf26faf5f30f64cb50a843f0ec8a0c3}\label{classCedar_1_1Core_1_1String_afaf26faf5f30f64cb50a843f0ec8a0c3}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!trim@{trim}}
+\index{trim@{trim}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{trim()}{trim()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} Cedar\+::\+Core\+::\+String\+::trim (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Remove string head and tail space.
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} value 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a61d862934ba1a22ff5f4c3c3252f97b3}\label{classCedar_1_1Core_1_1String_a61d862934ba1a22ff5f4c3c3252f97b3}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!trimEnd@{trimEnd}}
+\index{trimEnd@{trimEnd}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{trimEnd()}{trimEnd()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} Cedar\+::\+Core\+::\+String\+::trim\+End (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Remove string tail space.
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} value 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classCedar_1_1Core_1_1String_a78ba4a9017c1d8cf4682c3ba9c07d25d}\label{classCedar_1_1Core_1_1String_a78ba4a9017c1d8cf4682c3ba9c07d25d}} 
+\index{Cedar::Core::String@{Cedar::Core::String}!trimStart@{trimStart}}
+\index{trimStart@{trimStart}!Cedar::Core::String@{Cedar::Core::String}}
+\doxysubsubsection{\texorpdfstring{trimStart()}{trimStart()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} Cedar\+::\+Core\+::\+String\+::trim\+Start (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Remove string head space.
+
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classCedar_1_1Core_1_1String}{String}} value 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Cedar/\+Core/String.\+h\end{DoxyCompactItemize}
