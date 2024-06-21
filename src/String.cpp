@@ -407,7 +407,13 @@ Index String::find(const String& substring, Index startIndex) const {
 
     if (!pImpl->data || !substring.pImpl->data) return -1;
 
-    if (substring.pImpl->size == 0) return startIndex > this->length() ? -1 : startIndex;
+    if (substring.pImpl->size == 0) {
+        if (startIndex < 0) {
+            startIndex += this->length();  // 将负索引转换为正索引
+            if (startIndex < 0) return -1;  // 越界检查
+        }
+        return startIndex > this->length() ? -1 : startIndex;
+    }
 
     List<Rune> runes;
     List<Size> runeByteOffsets;
@@ -416,6 +422,11 @@ Index String::find(const String& substring, Index startIndex) const {
         Rune rune = pImpl->decodeRuneAt(i);
         runes.append(rune);
         i += Impl::bytesInRune(pImpl->data[i]);
+    }
+
+    if (startIndex < 0) {
+        startIndex += runes.size();  // 转换负索引为从末尾开始的正索引
+        if (startIndex < 0) return -1;  // 如果索引仍然是负数，表示它超出了字符串的起始边界
     }
 
     if (startIndex >= runes.size()) return -1;
@@ -436,7 +447,7 @@ Index String::find(const String& substring, Index startIndex) const {
 
     for (Index i = 0; i < subSize; ++i) {
         subHash = (subHash * prime + subRunes[i]) % Math::MaxValue<UInt64>();
-        curHash = (curHash * prime + runes[startIndex + i]) % Math::MaxValue<UInt64>();  // 从startIndex开始构建哈希
+        curHash = (curHash * prime + runes[startIndex + i]) % Math::MaxValue<UInt64>();
         if (i > 0) power = (power * prime) % Math::MaxValue<UInt64>();
     }
 
@@ -450,7 +461,7 @@ Index String::find(const String& substring, Index startIndex) const {
                 }
             }
             if (match) {
-                return i;  // 返回字符索引
+                return i;
             }
         }
 
@@ -461,7 +472,6 @@ Index String::find(const String& substring, Index startIndex) const {
 
     return -1;
 }
-
 
 String& String::operator=(const String& other) {
     if (this != &other) {

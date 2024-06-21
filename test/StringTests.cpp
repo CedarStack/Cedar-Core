@@ -148,4 +148,21 @@ namespace Cedar::Core {
         ASSERT_EQ(result, "hello 🌏");
     }
 
+    TEST(StringFindTest, Find) {
+        String asciiStr("Hello, World!");
+        EXPECT_EQ(asciiStr.find(String("World")), 7);
+        EXPECT_EQ(asciiStr.find(String("world")), -1);
+        EXPECT_EQ(asciiStr.find(String("Hello")), 0);
+        EXPECT_EQ(asciiStr.find(String("Z")), -1);
+
+        String chineseStr("你好，世界！");
+        EXPECT_EQ(chineseStr.find(String("你好")), 0);
+        EXPECT_EQ(chineseStr.find(String("，世界")), 2);
+        EXPECT_EQ(chineseStr.find(String("地球")), -1);
+
+        String emojiStr("🚀🌕🌟");
+        EXPECT_EQ(emojiStr.find(String("🚀")), 0);
+        EXPECT_EQ(emojiStr.find(String("🌕")), 1);
+        EXPECT_EQ(emojiStr.find(String("⭐")), -1);
+    }
 }  // namespace Cedar::Core

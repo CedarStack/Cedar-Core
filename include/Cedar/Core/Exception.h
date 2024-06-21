@@ -24,6 +24,7 @@
 #pragma once
 
 #include <exception>
+#include <Cedar/Core/BasicTypes.h>
 
 namespace Cedar::Core {
     class String;
