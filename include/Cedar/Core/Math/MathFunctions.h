@@ -64,6 +64,13 @@ namespace Cedar::Core::Math {
     template<typename T>
     T SmallestNormal();
 
+    template<typename T>
+    T Max();
+
+    template<typename T>
+    T Min();
+
+
     Boolean isNaN(Float32 value);
     Boolean isNaN(Float64 value);
 

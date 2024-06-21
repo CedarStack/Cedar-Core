@@ -5,7 +5,7 @@
 target_sources(Cedar PRIVATE
         Abs.cpp
         Ceil.cpp
-        Float.cpp
+        Bits.cpp
         Floor.cpp
         Round.cpp
         Sqrt.cpp
