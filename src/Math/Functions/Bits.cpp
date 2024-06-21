@@ -71,29 +71,29 @@ Float64 Math::SmallestNormal<Float64>() {
 }
 
 // Maximal values using hexadecimal notation
-template<> UInt8 Math::Max<UInt8>() { return 0xFF; }                   // 255
-template<> Int8 Math::Max<Int8>() { return 0x7F; }                    // 127
-template<> UInt16 Math::Max<UInt16>() { return 0xFFFF; }              // 65535
-template<> Int16 Math::Max<Int16>() { return 0x7FFF; }                // 32767
-template<> UInt32 Math::Max<UInt32>() { return 0xFFFFFFFFU; }         // 4294967295U
-template<> Int32 Math::Max<Int32>() { return 0x7FFFFFFF; }            // 2147483647
-template<> UInt64 Math::Max<UInt64>() { return 0xFFFFFFFFFFFFFFFFULL; }  // 18446744073709551615ULL
-template<> Int64 Math::Max<Int64>() { return 0x7FFFFFFFFFFFFFFFLL; }     // 9223372036854775807LL
+template<> UInt8 Math::MaxValue<UInt8>() { return 0xFF; }                   // 255
+template<> Int8 Math::MaxValue<Int8>() { return 0x7F; }                    // 127
+template<> UInt16 Math::MaxValue<UInt16>() { return 0xFFFF; }              // 65535
+template<> Int16 Math::MaxValue<Int16>() { return 0x7FFF; }                // 32767
+template<> UInt32 Math::MaxValue<UInt32>() { return 0xFFFFFFFFU; }         // 4294967295U
+template<> Int32 Math::MaxValue<Int32>() { return 0x7FFFFFFF; }            // 2147483647
+template<> UInt64 Math::MaxValue<UInt64>() { return 0xFFFFFFFFFFFFFFFFULL; }  // 18446744073709551615ULL
+template<> Int64 Math::MaxValue<Int64>() { return 0x7FFFFFFFFFFFFFFFLL; }     // 9223372036854775807LL
 
-template<> UInt8 Math::Min<UInt8>() { return 0x00; }                   // 0
-template<> Int8 Math::Min<Int8>() { return -0x80; }                    // -128
-template<> UInt16 Math::Min<UInt16>() { return 0x0000; }               // 0
-template<> Int16 Math::Min<Int16>() { return -0x8000; }                // -32768
-template<> UInt32 Math::Min<UInt32>() { return 0x00000000U; }          // 0U
-template<> Int32 Math::Min<Int32>() { return -0x80000000; }            // -2147483648
-template<> UInt64 Math::Min<UInt64>() { return 0x0000000000000000ULL; }  // 0ULL
-template<> Int64 Math::Min<Int64>() { return -0x8000000000000000LL; }     // -9223372036854775808LL
+template<> UInt8 Math::MinValue<UInt8>() { return 0x00; }                   // 0
+template<> Int8 Math::MinValue<Int8>() { return -0x80; }                    // -128
+template<> UInt16 Math::MinValue<UInt16>() { return 0x0000; }               // 0
+template<> Int16 Math::MinValue<Int16>() { return -0x8000; }                // -32768
+template<> UInt32 Math::MinValue<UInt32>() { return 0x00000000U; }          // 0U
+template<> Int32 Math::MinValue<Int32>() { return -0x80000000; }            // -2147483648
+template<> UInt64 Math::MinValue<UInt64>() { return 0x0000000000000000ULL; }  // 0ULL
+template<> Int64 Math::MinValue<Int64>() { return -0x8000000000000000LL; }     // -9223372036854775808LL
 
-template<> Float32 Math::Max<Float32>() { return 3.402823e+38F; }      // Maximum for Float32
-template<> Float64 Math::Max<Float64>() { return 1.7976931348623157e+308; }   // Maximum for Float64
+template<> Float32 Math::MaxValue<Float32>() { return 3.402823e+38F; }      // Maximum for Float32
+template<> Float64 Math::MaxValue<Float64>() { return 1.7976931348623157e+308; }   // Maximum for Float64
 
-template<> Float32 Math::Min<Float32>() { return -3.402823e+38F; }     // Minimum for Float32
-template<> Float64 Math::Min<Float64>() { return -1.7976931348623157e+308; }  // Minimum for Float64
+template<> Float32 Math::MinValue<Float32>() { return -3.402823e+38F; }     // Minimum for Float32
+template<> Float64 Math::MinValue<Float64>() { return -1.7976931348623157e+308; }  // Minimum for Float64
 
 
 Boolean Math::isNaN(Float32 value) {

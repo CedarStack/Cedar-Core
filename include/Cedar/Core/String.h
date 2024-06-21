@@ -40,18 +40,22 @@ namespace Cedar::Core {
         String(CString str, Size len);
         String(const String& other);
         String(String&& other) noexcept;
+        String(Rune rune);
+
         ~String();
 
         [[nodiscard]] Size length() const;
 
         [[nodiscard]] Rune at(Index index) const;
-        Rune operator[](Index index) const;
+        [[nodiscard]] Rune operator[](Index index) const;
 
         [[nodiscard]] String trim() const;
         [[nodiscard]] String trimStart() const;
         [[nodiscard]] String trimEnd() const;
         [[nodiscard]] String stripPrefix(const String& prefix) const;
         [[nodiscard]] String stripSuffix(const String& suffix) const;
+        [[nodiscard]] String substring(Size start, Size len = NPos) const;
+        [[nodiscard]] String replace(const String& oldStr, const String& newStr) const;
 
         [[nodiscard]] Boolean contains(const String& substring) const;
         [[nodiscard]] Boolean startsWith(const String& prefix) const;
@@ -59,7 +63,7 @@ namespace Cedar::Core {
 
         [[nodiscard]] Container::List<String> split(const String& delimiter) const;
         [[nodiscard]] Container::List<String> getLines() const;
-        [[nodiscard]] Index find(const String& substring) const;
+        [[nodiscard]] Index find(const String& substring, Index startIndex = 0) const;
 
         String& operator=(const String& other);
         String& operator=(String&& other) noexcept;

@@ -24,11 +24,43 @@
 #include <Cedar/Core/String.h>
 #include <Cedar/Core/Memory.h>
 #include <Cedar/Core/InvalidStateException.h>
+#include <Cedar/Core/OutOfRangeException.h>
 #include <Cedar/Core/Container/List.h>
+#include <Cedar/Core/Container/Array.h>
 #include <Cedar/Core/Math/MathFunctions.h>
 
 using namespace Cedar::Core;
 using namespace Cedar::Core::Container;
+
+class BoyerMooreSearch {
+public:
+    static void buildLast(const String &pattern, int last[]) {
+        for (Int32 i = 0; i < 256; ++i) last[i] = -1;
+        for (Int32 i = 0; i < pattern.length(); ++i) {
+            last[pattern.at(i)] = i;
+        }
+    }
+
+    static int search(const String &text, const String &pattern) {
+        Int32 last[256];
+        buildLast(pattern, last);
+        Int32 n = text.length();
+        Int32 m = pattern.length();
+        Int32 skip;
+
+        for (Int32 i = 0; i <= n - m; i += skip) {
+            skip = 0;
+            for (Int32 j = m - 1; j >= 0; --j) {
+                if (pattern.at(j) != text.at(i + j)) {
+                    skip = Math::max(1, j - last[text.at(i + j)]);
+                    break;
+                }
+            }
+            if (skip == 0) return i; // found
+        }
+        return -1; // not found
+    }
+};
 
 struct String::Impl {
     Byte* data;
@@ -125,6 +157,33 @@ String::String(const String& other) : pImpl(new Impl(*other.pImpl)) {}
 
 String::String(String&& other) noexcept : pImpl(other.pImpl) {
     other.pImpl = nullptr;
+}
+
+String::String(Rune rune) {
+// Handle encoding Rune to UTF-8 and store in Impl
+    Byte buffer[5]; // Buffer for UTF-8 encoding, max 4 bytes + null terminator
+    if (rune < 0x80) {
+        buffer[0] = static_cast<Byte>(rune);
+        buffer[1] = '\0';
+    } else if (rune < 0x800) {
+        buffer[0] = 0xC0 | (rune >> 6);
+        buffer[1] = 0x80 | (rune & 0x3F);
+        buffer[2] = '\0';
+    } else if (rune < 0x10000) {
+        buffer[0] = 0xE0 | (rune >> 12);
+        buffer[1] = 0x80 | ((rune >> 6) & 0x3F);
+        buffer[2] = 0x80 | (rune & 0x3F);
+        buffer[3] = '\0';
+    } else if (rune <= 0x10FFFF) {
+        buffer[0] = 0xF0 | (rune >> 18);
+        buffer[1] = 0x80 | ((rune >> 12) & 0x3F);
+        buffer[2] = 0x80 | ((rune >> 6) & 0x3F);
+        buffer[3] = 0x80 | (rune & 0x3F);
+        buffer[4] = '\0';
+    } else {
+        buffer[0] = '\0';  // Invalid rune
+    }
+    pImpl = new Impl(reinterpret_cast<CString>(buffer));
 }
 
 String::~String() {
@@ -225,6 +284,57 @@ String String::stripSuffix(const String& suffix) const {
     return *this; // Return original string if no suffix found
 }
 
+String String::substring(Size start, Size len) const {
+    if (pImpl == nullptr) {
+        throw InvalidStateException("Attempt to use a moved-from String object.");
+    }
+
+    List<Rune> runes;
+    for (Size i = 0; i < pImpl->size; ) {
+        Rune rune = pImpl->decodeRuneAt(i);
+        runes.append(rune);
+        i += Impl::bytesInRune(pImpl->data[i]);
+    }
+
+    if (start >= runes.size()) {
+        throw OutOfRangeException("Start index is out of range");
+    }
+
+    Size actualLength = (len == NPos || start + len > runes.size()) ? runes.size() - start : len;
+    String result;
+    for (Size i = start; i < start + actualLength; ++i) {
+        result = result + String(runes[i]);
+    }
+    return result;
+}
+
+String String::replace(const String& oldStr, const String& newStr) const {
+    if (pImpl == nullptr) {
+        throw InvalidStateException("Attempt to use a moved-from String object.");
+    }
+
+    if (oldStr.pImpl->size == 0) {
+        return *this;
+    }
+
+    String result;
+    Size start = 0;
+    int foundPos = this->find(oldStr);
+
+    while (foundPos != -1) {
+        result = result + this->substring(start, foundPos - start);
+        result = result + newStr;
+        start = foundPos + oldStr.length();
+        if (start >= this->length()) break;
+        foundPos = this->find(oldStr, start);
+    }
+
+    if (start < this->length()) {
+        result = result + this->substring(start);
+    }
+    return result;
+}
+
 Boolean String::contains(const String &substring) const {
     return this->find(substring) != -1;
 }
@@ -290,14 +400,14 @@ List<String> String::getLines() const {
     return this->split("\n");
 }
 
-Index String::find(const String& substring) const {
+Index String::find(const String& substring, Index startIndex) const {
     if (pImpl == nullptr) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
     if (!pImpl->data || !substring.pImpl->data) return -1;
 
-    if (substring.pImpl->size == 0) return 0;
+    if (substring.pImpl->size == 0) return startIndex > this->length() ? -1 : startIndex;
 
     List<Rune> runes;
     List<Size> runeByteOffsets;
@@ -307,6 +417,8 @@ Index String::find(const String& substring) const {
         runes.append(rune);
         i += Impl::bytesInRune(pImpl->data[i]);
     }
+
+    if (startIndex >= runes.size()) return -1;
 
     List<Rune> subRunes;
     for (Size i = 0; i < substring.pImpl->size; ) {
@@ -323,12 +435,12 @@ Index String::find(const String& substring) const {
     UInt64 subHash = 0, curHash = 0, power = 1;
 
     for (Index i = 0; i < subSize; ++i) {
-        subHash = (subHash * prime + subRunes[i]) % Math::Max<UInt64>();
-        curHash = (curHash * prime + runes[i]) % Math::Max<UInt64>();
-        if (i > 0) power = (power * prime) % Math::Max<UInt64>();
+        subHash = (subHash * prime + subRunes[i]) % Math::MaxValue<UInt64>();
+        curHash = (curHash * prime + runes[startIndex + i]) % Math::MaxValue<UInt64>();  // 从startIndex开始构建哈希
+        if (i > 0) power = (power * prime) % Math::MaxValue<UInt64>();
     }
 
-    for (Index i = 0; i <= thisSize - subSize; ++i) {
+    for (Index i = startIndex; i <= thisSize - subSize; ++i) {
         if (subHash == curHash) {
             bool match = true;
             for (Index j = 0; j < subSize; ++j) {
@@ -338,17 +450,18 @@ Index String::find(const String& substring) const {
                 }
             }
             if (match) {
-                return i;
+                return i;  // 返回字符索引
             }
         }
 
         if (i < thisSize - subSize) {
-            curHash = (prime * (curHash - runes[i] * power) + runes[i + subSize]) % Math::Max<UInt64>();
+            curHash = (prime * (curHash - runes[i] * power) + runes[i + subSize]) % Math::MaxValue<UInt64>();
         }
     }
 
     return -1;
 }
+
 
 String& String::operator=(const String& other) {
     if (this != &other) {
@@ -367,15 +480,16 @@ String& String::operator=(String&& other) noexcept {
 }
 
 String String::operator+(const String& other) const {
-    if (pImpl == nullptr) {
+    if (pImpl == nullptr || other.pImpl == nullptr) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
-
     Size newSize = this->pImpl->size + other.pImpl->size;
     Byte* newData = static_cast<Byte*>(Memory::allocate(newSize + 1));
-    Memory::copy(newData, this->pImpl->data, this->pImpl->size);
-    Memory::copy(newData + this->pImpl->size, other.pImpl->data, other.pImpl->size);
-    newData[newSize] = '\0';
+    if (newData) {
+        Memory::copy(newData, this->pImpl->data, this->pImpl->size);
+        Memory::copy(newData + this->pImpl->size, other.pImpl->data, other.pImpl->size);
+        newData[newSize] = '\0';
+    }
     return {reinterpret_cast<CString>(newData), newSize};
 }
 

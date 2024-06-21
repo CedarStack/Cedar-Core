@@ -36,6 +36,9 @@ public:
 Exception::Exception(const String& message)
         : pImpl(new Impl(message)) {}
 
+Exception::Exception(CString message)
+        : pImpl(new Impl(message)) {}
+
 Exception::~Exception() {
     delete pImpl;
 }

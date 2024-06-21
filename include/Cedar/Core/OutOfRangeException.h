@@ -29,5 +29,6 @@ namespace Cedar::Core {
     class OutOfRangeException: public Exception {
     public:
         explicit OutOfRangeException(const String& message): Exception(message) {}
+        explicit OutOfRangeException(CString message): Exception(message) {}
     };
 }

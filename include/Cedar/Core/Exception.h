@@ -31,6 +31,7 @@ namespace Cedar::Core {
     class Exception : public std::exception {
     public:
         explicit Exception(const String &message);
+        explicit Exception(CString message);
 
         ~Exception();
 

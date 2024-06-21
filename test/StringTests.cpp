@@ -105,4 +105,47 @@ namespace Cedar::Core {
         EXPECT_EQ(parts[2], "three");
     }
 
+    TEST(StringTests, SubstringUnicode) {
+        String text("Hello, 世界🌏!");
+
+        String sub = text.substring(7, 3);
+        ASSERT_EQ(std::string(sub.rawString()), "世界🌏");
+
+        // Substring that starts with an Emoji
+        sub = text.substring(9, 2);
+        ASSERT_EQ(std::string(sub.rawString()), "🌏!");
+
+        // Substring with only part of the string (avoiding Unicode characters)
+        sub = text.substring(0, 5);
+        ASSERT_EQ(std::string(sub.rawString()), "Hello");
+
+        // Out of range start index
+        EXPECT_THROW(text.substring(15, 1), OutOfRangeException);
+
+        // Length extends beyond the end of the string
+        sub = text.substring(7, 10); // Should handle this gracefully
+        ASSERT_EQ(std::string(sub.rawString()), "世界🌏!");
+    }
+
+    TEST(StringTest, ReplaceMethod) {
+        String original("hello world");
+        String result = original.replace("world", "there");
+        ASSERT_EQ(result, "hello there");
+
+        result = original.replace("test", "there");
+        ASSERT_EQ(result, "hello world");
+
+        result = original.replace("", "there");
+        ASSERT_EQ(result, "hello world");
+
+        result = original.replace("world", "everyone here");
+        ASSERT_EQ(result, "hello everyone here");
+
+        result = original.replace("world", "all");
+        ASSERT_EQ(result, "hello all");
+
+        result = original.replace("world", "🌏");
+        ASSERT_EQ(result, "hello 🌏");
+    }
+
 }  // namespace Cedar::Core

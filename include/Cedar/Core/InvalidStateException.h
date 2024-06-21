@@ -29,5 +29,7 @@ namespace Cedar::Core {
     class InvalidStateException: public Exception {
     public:
         explicit InvalidStateException(const String& message): Exception(message) {}
+        explicit InvalidStateException(CString message): Exception(message) {}
+
     };
 }
