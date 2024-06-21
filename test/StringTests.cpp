@@ -182,5 +182,11 @@ namespace Cedar::Core {
         EXPECT_EQ(emojiStr.find(String("🚀")), 0);
         EXPECT_EQ(emojiStr.find(String("🌕")), 1);
         EXPECT_EQ(emojiStr.find(String("⭐")), -1);
+
+        String pathStr("/usr/bin/bash");
+        EXPECT_EQ(pathStr.find(String("/"), -1), 8);
+        EXPECT_EQ(pathStr.find(String("/"), 1), 4);
+        EXPECT_EQ(pathStr.find(String("/"), 0), 0);
+
     }
 }  // namespace Cedar::Core

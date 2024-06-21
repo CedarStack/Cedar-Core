@@ -410,29 +410,12 @@ Index String::find(const String& substring, Index startIndex) const {
 
     if (!pImpl->data || !substring.pImpl->data) return -1;
 
-    if (substring.pImpl->size == 0) {
-        if (startIndex < 0) {
-            startIndex += this->length();  // 将负索引转换为正索引
-            if (startIndex < 0) return -1;  // 越界检查
-        }
-        return startIndex > this->length() ? -1 : startIndex;
-    }
-
     List<Rune> runes;
-    List<Size> runeByteOffsets;
     for (Size i = 0; i < pImpl->size; ) {
-        runeByteOffsets.append(i);
         Rune rune = pImpl->decodeRuneAt(i);
         runes.append(rune);
         i += Impl::bytesInRune(pImpl->data[i]);
     }
-
-    if (startIndex < 0) {
-        startIndex += runes.size();  // 转换负索引为从末尾开始的正索引
-        if (startIndex < 0) return -1;  // 如果索引仍然是负数，表示它超出了字符串的起始边界
-    }
-
-    if (startIndex >= runes.size()) return -1;
 
     List<Rune> subRunes;
     for (Size i = 0; i < substring.pImpl->size; ) {
@@ -441,35 +424,37 @@ Index String::find(const String& substring, Index startIndex) const {
         i += Impl::bytesInRune(substring.pImpl->data[i]);
     }
 
-    Size thisSize = runes.size();
-    Size subSize = subRunes.size();
-    if (subSize > thisSize || subSize == 0) return -1;
+    int thisSize = runes.size();
+    int subSize = subRunes.size();
 
-    const UInt64 prime = 101;
-    UInt64 subHash = 0, curHash = 0, power = 1;
+    if (subSize > thisSize) return -1;
 
-    for (Index i = 0; i < subSize; ++i) {
-        subHash = (subHash * prime + subRunes[i]) % Math::MaxValue<UInt64>();
-        curHash = (curHash * prime + runes[startIndex + i]) % Math::MaxValue<UInt64>();
-        if (i > 0) power = (power * prime) % Math::MaxValue<UInt64>();
-    }
-
-    for (Index i = startIndex; i <= thisSize - subSize; ++i) {
-        if (subHash == curHash) {
-            bool match = true;
-            for (Index j = 0; j < subSize; ++j) {
-                if (runes[i + j] != subRunes[j]) {
-                    match = false;
+    if (startIndex < 0) {
+        startIndex = thisSize + startIndex;
+        for (int i = startIndex; i >= 0; --i) {
+            bool found = true;
+            for (int j = 0; j < subSize; ++j) {
+                if (i + j >= thisSize || runes[i + j] != subRunes[j]) {
+                    found = false;
                     break;
                 }
             }
-            if (match) {
-                return i;
-            }
+            if (found) return i;
+        }
+    } else {
+        if (startIndex > thisSize - subSize) {
+            return -1;
         }
 
-        if (i < thisSize - subSize) {
-            curHash = (prime * (curHash - runes[i] * power) + runes[i + subSize]) % Math::MaxValue<UInt64>();
+        for (int i = startIndex; i <= thisSize - subSize; ++i) {
+            bool found = true;
+            for (int j = 0; j < subSize; ++j) {
+                if (runes[i + j] != subRunes[j]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) return i;
         }
     }
 
