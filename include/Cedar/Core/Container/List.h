@@ -41,35 +41,35 @@ namespace Cedar::Core::Container {
     template<typename T>
     class List {
     private:
-        ListNode<T>* head;
-        ListNode<T>* tail;
-        Size size;
-        Threading::Mutex mtx;
+        ListNode<T>* m_head;
+        ListNode<T>* m_tail;
+        Size m_size;
+        Threading::Mutex m_mtx;
 
     public:
-        List() : head(nullptr), tail(nullptr), size(0) {}
+        List() : m_head(nullptr), m_tail(nullptr), m_size(0) {}
 
         ~List() {
             clear();
         }
 
         void append(T value) {
-            mtx.lock();
+            m_mtx.lock();
             auto* newNode = new ListNode<T>(value);
-            if (!head) {
-                head = newNode;
-                tail = newNode;
+            if (!m_head) {
+                m_head = newNode;
+                m_tail = newNode;
             } else {
-                tail->next = newNode;
-                tail = newNode;
+                m_tail->next = newNode;
+                m_tail = newNode;
             }
-            size++;
-            mtx.unlock();
+            m_size++;
+            m_mtx.unlock();
         }
 
         bool remove(T value) {
-            mtx.lock();
-            ListNode<T>* current = head;
+            m_mtx.lock();
+            ListNode<T>* current = m_head;
             ListNode<T>* prev = nullptr;
 
             while (current != nullptr) {
@@ -77,48 +77,48 @@ namespace Cedar::Core::Container {
                     if (prev) {
                         prev->next = current->next;
                     } else {
-                        head = current->next;
+                        m_head = current->next;
                     }
 
-                    if (current == tail) {
-                        tail = prev;
+                    if (current == m_tail) {
+                        m_tail = prev;
                     }
 
                     delete current;
-                    size--;
-                    mtx.unlock();
+                    m_size--;
+                    m_mtx.unlock();
                     return true;
                 }
                 prev = current;
                 current = current->next;
             }
-            mtx.unlock();
+            m_mtx.unlock();
             return false;
         }
 
         void clear() {
-            mtx.lock();
-            ListNode<T>* current = head;
+            m_mtx.lock();
+            ListNode<T>* current = m_head;
             while (current != nullptr) {
                 ListNode<T>* next = current->next;
                 delete current;
                 current = next;
             }
-            head = nullptr;
-            tail = nullptr;
-            size = 0;
-            mtx.unlock();
+            m_head = nullptr;
+            m_tail = nullptr;
+            m_size = 0;
+            m_mtx.unlock();
         }
 
-        [[nodiscard]] Size getSize() const {
-            mtx.lock();
-            Size currentSize = size;
-            mtx.unlock();
+        [[nodiscard]] Size size() const {
+            m_mtx.lock();
+            Size currentSize = m_size;
+            m_mtx.unlock();
             return currentSize;
         }
 
         ListNode<T>* getNodeAt(Index index) const {
-            ListNode<T>* current = head;
+            ListNode<T>* current = m_head;
             Index currentIndex = 0;
             while (current != nullptr && currentIndex < index) {
                 current = current->next;
@@ -128,52 +128,52 @@ namespace Cedar::Core::Container {
         }
 
         T& operator[](Index index) {
-            mtx.lock();
+            m_mtx.lock();
             ListNode<T>* node = getNodeAt(index);
             if (node == nullptr) {
-                mtx.unlock();
+                m_mtx.unlock();
                 throw OutOfRangeException("Index out of range");
             }
             T& value = node->value;
-            mtx.unlock();
+            m_mtx.unlock();
             return value;
         }
 
         const T& operator[](Index index) const {
-            mtx.lock();
+            m_mtx.lock();
             ListNode<T>* node = getNodeAt(index);
             if (node == nullptr) {
-                mtx.unlock();
+                m_mtx.unlock();
                 throw OutOfRangeException("Index out of range");
             }
             const T& value = node->value;
-            mtx.unlock();
+            m_mtx.unlock();
             return value;
         }
 
         class Iterator {
         public:
-            explicit Iterator(ListNode<T>* node) : current(node) {}
+            explicit Iterator(ListNode<T>* node) : m_current(node) {}
 
             T& operator*() const {
-                return current->value;
+                return m_current->value;
             }
 
             Iterator& operator++() {
-                if (current) current = current->next;
+                if (m_current) m_current = m_current->next;
                 return *this;
             }
 
             bool operator!=(const Iterator& other) const {
-                return current != other.current;
+                return m_current != other.m_current;
             }
 
         private:
-            ListNode<T>* current;
+            ListNode<T>* m_current;
         };
 
         Iterator begin() const {
-            return Iterator(head);
+            return Iterator(m_head);
         }
 
         Iterator end() const {
