@@ -32,16 +32,16 @@ namespace Cedar::Core::Container {
 
     template<typename T, typename... Ts>
     class Tuple<T, Ts...> : public Tuple<Ts...> {
-        T value;
+        T m_value;
     public:
-        Tuple(T val, Ts... vals) : Tuple<Ts...>(vals...), value(val) {}
+        Tuple(T val, Ts... vals) : Tuple<Ts...>(vals...), m_value(val) {}
 
-        T getValue() { return value; }
+        T getValue() { return m_value; }
 
         template<int index>
         auto get() {
             if constexpr (index == 0) {
-                return value;
+                return m_value;
             } else {
                 return Tuple<Ts...>::template get<index - 1>();
             }
