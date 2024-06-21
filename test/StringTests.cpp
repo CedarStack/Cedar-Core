@@ -85,6 +85,24 @@ namespace Cedar::Core {
         EXPECT_TRUE(std::string(emoji.rawString()) == "😊👍");
     }
 
+    TEST(StringTest, AccessWithPositiveAndNegativeIndices) {
+        String testStr(u8"Hello, 世界! 👋");
+
+        // Test positive indices
+        EXPECT_EQ(testStr.at(0), 'H');   // First character
+        EXPECT_EQ(testStr.at(7), u'世');  // First Chinese character
+        EXPECT_EQ(testStr.at(11), String("👋")[0]); // Emoji
+
+        // Test negative indices
+        EXPECT_EQ(testStr.at(-1), String("👋")[0]); // Last character (Emoji)
+        EXPECT_EQ(testStr.at(-3), '!');  // Before Emoji
+        EXPECT_EQ(testStr.at(-4), u'界'); // Second Chinese character
+
+        // Test out-of-range access should throw an exception
+        EXPECT_THROW(testStr.at(testStr.length()), OutOfRangeException);   // Access beyond valid range
+        EXPECT_THROW(testStr.at(-testStr.length() - 1), OutOfRangeException); // Access beyond the start
+    }
+
 // Test string operations
     TEST(StringTest, StringOperations) {
         String s("  trim me  ");

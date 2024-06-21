@@ -215,7 +215,11 @@ Rune String::at(Index index) const {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
-    if (!pImpl->data || index >= pImpl->size) {
+    if (index < 0) {
+        index += this->length();
+    }
+
+    if (index < 0 || index >= this->length()) {
         throw OutOfRangeException("Out of range");
     }
 
@@ -235,7 +239,6 @@ Rune String::at(Index index) const {
 Rune String::operator[](Index index) const {
     return this->at(index);
 }
-
 
 String String::trimStart() const {
     if (pImpl == nullptr) {
