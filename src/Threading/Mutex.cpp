@@ -26,8 +26,9 @@
 
 using namespace Cedar::Core::Threading;
 
-class Mutex::Impl {
-public:
+struct Mutex::Impl {
+    pthread_mutex_t mutex{};
+
     Impl() {
         pthread_mutex_init(&mutex, nullptr);
     }
@@ -43,9 +44,6 @@ public:
     void unlock() {
         pthread_mutex_unlock(&mutex);
     }
-
-private:
-    pthread_mutex_t mutex;
 };
 
 Mutex::Mutex() : pImpl(new Impl()) {}
