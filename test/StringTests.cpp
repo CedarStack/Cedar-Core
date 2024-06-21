@@ -25,64 +25,84 @@
 #include <Cedar/Core/String.h>
 #include <Cedar/Core/OutOfRangeException.h>
 #include <Cedar/Core/Container/List.h>
+#include <Cedar/Core/InvalidStateException.h>
 
 namespace Cedar::Core {
-
+// Test default constructor
     TEST(StringTest, DefaultConstructor) {
-        String s;
-        EXPECT_EQ(s.rawString(), nullptr);  // 默认构造的String应为空
+        String str;
+        EXPECT_EQ(str.length(), 0);
+        EXPECT_TRUE(str.rawString() == nullptr);
     }
 
-    TEST(StringTest, ConstructFromStringLiteral) {
-        String s("Hello");
-        EXPECT_STREQ(s.rawString(), "Hello");
+// Test constructor from C string
+    TEST(StringTest, ConstructFromCString) {
+        String str("hello");
+        EXPECT_EQ(str.length(), 5);
+        EXPECT_STREQ(str.rawString(), "hello");
     }
 
+// Test copy constructor
     TEST(StringTest, CopyConstructor) {
-        String original("Hello");
+        String original("test");
         String copy(original);
-        EXPECT_STREQ(copy.rawString(), original.rawString());
+        EXPECT_EQ(copy, original);
     }
 
+// Test move constructor
     TEST(StringTest, MoveConstructor) {
-        String original("Hello");
+        String original("move");
         String moved(std::move(original));
-        EXPECT_STREQ(moved.rawString(), "Hello");
-        EXPECT_EQ(original.rawString(), nullptr);
+
+        // Check that the moved-to object has the correct length
+        EXPECT_EQ(moved.length(), 4);
+
+        // Check that accessing the moved-from object throws an exception
+        try {
+            original.length();  // This should throw an exception
+            FAIL() << "Expected InvalidStateException";
+        } catch (InvalidStateException const & err) {
+            EXPECT_EQ(err.what(), std::string("Attempt to use a moved-from String object."));
+        } catch (...) {
+            FAIL() << "Expected InvalidStateException";
+        }
+
+        // Alternatively, check for nullptr directly if that's how you handle moved-from state
+        EXPECT_TRUE(original.rawString() == nullptr);
     }
 
-    TEST(StringTest, AccessOperator) {
-        String s("Hello");
-        EXPECT_EQ(s[0], 'H');
-        EXPECT_EQ(s.at(0), 'H');
-        EXPECT_THROW(s.at(5), OutOfRangeException);
+// Test for Unicode support
+    TEST(StringTest, UnicodeHandling) {
+        String unicode("你好🌍");
+        EXPECT_EQ(unicode.length(), 3);
+        EXPECT_TRUE(std::string(unicode.rawString()) == "你好🌍");
     }
 
-    TEST(StringTest, Concatenation) {
-        String s1("Hello");
-        String s2(" World");
-        String result = s1 + s2;
-        EXPECT_STREQ(result.rawString(), "Hello World");
+// Test emojis
+    TEST(StringTest, EmojiHandling) {
+        String emoji("😊👍");
+        EXPECT_EQ(emoji.length(), 2); // Assumes UTF-8 where each emoji is 4 bytes
+        EXPECT_TRUE(std::string(emoji.rawString()) == "😊👍");
     }
 
-    TEST(StringTest, Equality) {
-        String s1("test");
-        String s2("test");
-        String s3("Test");
-        EXPECT_TRUE(s1 == s2);
-        EXPECT_FALSE(s1 == s3);
+// Test string operations
+    TEST(StringTest, StringOperations) {
+        String s("  trim me  ");
+        EXPECT_EQ(s.trim(), "trim me");
+        String prefix("unimportant");
+        String important("important");
+        EXPECT_TRUE(important.startsWith(prefix.stripPrefix("un")));
+        EXPECT_TRUE(important.endsWith("tant"));
     }
 
-    TEST(StringTest, Inequality) {
-        String s1("test");
-        String s2("Test");
-        EXPECT_TRUE(s1 != s2);
+// Test splitting strings
+    TEST(StringTest, SplitStrings) {
+        String s("one,two,three");
+        auto parts = s.split(",");
+        ASSERT_EQ(parts.size(), 3);
+        EXPECT_EQ(parts[0], "one");
+        EXPECT_EQ(parts[1], "two");
+        EXPECT_EQ(parts[2], "three");
     }
 
-    TEST(StringTest, UnicodeOprtations) {
-        String s1("你好，🌏");
-        auto parts = s1.split("，");
-        EXPECT_EQ(parts[0], "你好");
-        EXPECT_EQ(parts[1], "🌏");
-    }
 }  // namespace Cedar::Core

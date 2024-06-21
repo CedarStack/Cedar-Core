@@ -42,17 +42,36 @@ namespace Cedar::Core {
         String(String&& other) noexcept;
         ~String();
 
-        Rune at(Index index) const;
-        CString rawString() const noexcept;
+        [[nodiscard]] Size length() const;
 
-        Container::List<String> split(const String& delimiter) const;
-
+        [[nodiscard]] Rune at(Index index) const;
         Rune operator[](Index index) const;
+
+        [[nodiscard]] String trim() const;
+        [[nodiscard]] String trimStart() const;
+        [[nodiscard]] String trimEnd() const;
+        [[nodiscard]] String stripPrefix(const String& prefix) const;
+        [[nodiscard]] String stripSuffix(const String& suffix) const;
+
+        [[nodiscard]] Boolean contains(const String& substring) const;
+        [[nodiscard]] Boolean startsWith(const String& prefix) const;
+        [[nodiscard]] Boolean endsWith(const String& suffix) const;
+
+        [[nodiscard]] Container::List<String> split(const String& delimiter) const;
+        [[nodiscard]] Container::List<String> getLines() const;
+        [[nodiscard]] Index find(const String& substring) const;
+
         String& operator=(const String& other);
         String& operator=(String&& other) noexcept;
         String operator+(const String& other) const;
         Boolean operator==(const String& other) const;
         Boolean operator!=(const String& other) const;
+
+        [[nodiscard]] CString rawString() const noexcept;
+
+        static Boolean isWhitespace(Rune rune);
+
+        static const Index NPos = -1;
     private:
         struct Impl;
         Impl* pImpl;
