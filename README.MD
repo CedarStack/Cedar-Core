@@ -2,11 +2,11 @@
 
 Cedar-Stack 是一个全新且处于开发初期的C++框架，目前正在积极开发中。它旨在为现代工业级软件开发提供一个全面且模块化的解决方案。该框架的设计考虑到了易用性和性能的平衡，以适应不同的开发需求。
 
-![GitHub repo size](https://img.shields.io/github/repo-size/CedarStack/Cedar-Stack?style=for-the-badge)
-![GitHub language count](https://img.shields.io/github/languages/count/CedarStack/Cedar-Stack?style=for-the-badge)
-![GitHub forks](https://img.shields.io/github/forks/CedarStack/Cedar-Stack?style=for-the-badge)
-![Bitbucket open issues](https://img.shields.io/bitbucket/issues/CedarStack/Cedar-Stack?style=for-the-badge)
-![Bitbucket open pull requests](https://img.shields.io/bitbucket/pr-raw/CedarStack/Cedar-Stack?style=for-the-badge)
+![GitHub repo size](https://img.shields.io/github/repo-size/CedarStack/Cedar-Core?style=for-the-badge)
+![GitHub language count](https://img.shields.io/github/languages/count/CedarStack/Cedar-Core?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/CedarStack/Cedar-Core?style=for-the-badge)
+![Bitbucket open issues](https://img.shields.io/bitbucket/issues/CedarStack/Cedar-Core?style=for-the-badge)
+![Bitbucket open pull requests](https://img.shields.io/bitbucket/pr-raw/CedarStack/Cedar-Core?style=for-the-badge)
 
 <img src="logo-image.png" alt="Logo image">
 
