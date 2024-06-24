@@ -73,16 +73,16 @@ namespace Cedar::Core::IO {
         auto parts = p.decomposeList();
         ASSERT_EQ(parts.size(), 4);
         EXPECT_EQ(parts[0].toString(), "C:");
-        EXPECT_EQ(parts[1].toString(), "Users");
-        EXPECT_EQ(parts[2].toString(), "Test");
-        EXPECT_EQ(parts[3].toString(), "File.txt");
+        EXPECT_EQ(parts[1].toString(), "C:/Users");
+        EXPECT_EQ(parts[2].toString(), "C:/Users/Test");
+        EXPECT_EQ(parts[3].toString(), "C:/Users/Test/File.txt");
     }
 
     TEST(PathTest, PathSegment) {
         Path p("C:/Users/Test/File.txt");
         EXPECT_EQ(p[0].toString(), "C:");
-        EXPECT_EQ(p[1].toString(), "Users");
-        EXPECT_EQ(p[2].toString(), "Test");
-        EXPECT_EQ(p[3].toString(), "File.txt");
+        EXPECT_EQ(p[1].toString(), "C:/Users");
+        EXPECT_EQ(p[2].toString(), "C:/Users/Test");
+        EXPECT_EQ(p[3].toString(), "C:/Users/Test/File.txt");
     }
 }

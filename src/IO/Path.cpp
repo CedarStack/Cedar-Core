@@ -22,7 +22,6 @@
  */
 
 #include <Cedar/Core/IO/Path.h>
-#include <cstdio>
 
 using namespace Cedar::Core;
 using namespace Cedar::Core::IO;
@@ -32,7 +31,7 @@ const String pathSeparator = "/";
 static String normalize(const String& path) {
     String normalizedPath = path.replace("\\", "/");
 
-    Size pos = 0;
+    Index pos = 0;
     while ((pos = normalizedPath.find("//", pos + 2)) != String::NPos) {
         normalizedPath = normalizedPath.substring(0, pos) + normalizedPath.substring(pos + 1);
     }
@@ -101,15 +100,20 @@ Size Path::calculateDepth() const {
 Container::List<Path> Path::decomposeList() const {
     Container::List<Path> parts;
     Size start = 0, end;
+
     while ((end = pImpl->path.find(pathSeparator, start)) != String::NPos) {
-        if (end != start) { // Skip empty parts
-            parts.append(Path(pImpl->path.substring(start, end - start)));
+        if (end != start) {
+            String part = pImpl->path.substring(0, end);
+            parts.append(Path(part));
         }
         start = end + 1;
     }
+
     if (start < pImpl->path.length()) {
-        parts.append(Path(pImpl->path.substring(start)));
+        String part = pImpl->path.substring(0, pImpl->path.length());
+        parts.append(Path(part));
     }
+
     return parts;
 }
 
