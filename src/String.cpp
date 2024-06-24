@@ -444,8 +444,9 @@ String String::operator+(const String& other) const {
     return {reinterpret_cast<CString>(newData), newSize};
 }
 
-String String::operator+=(const String& other) const {
-    return *this + other;
+String String::operator+=(const String& other) {
+    *this = *this + other;
+    return *this;
 }
 
 bool String::operator==(const String& other) const {

@@ -68,7 +68,7 @@ namespace Cedar::Core {
         String& operator=(const String& other);
         String& operator=(String&& other) noexcept;
         String operator+(const String& other) const;
-        String operator+=(const String& other) const;
+        String operator+=(const String& other);
         Boolean operator==(const String& other) const;
         Boolean operator!=(const String& other) const;
 
