@@ -83,7 +83,7 @@ String::~String() {
 }
 
 Size String::length() const {
-    if (pImpl == nullptr) {
+    if (!pImpl) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
@@ -100,7 +100,7 @@ Size String::length() const {
 }
 
 Rune String::at(Index index) const {
-    if (pImpl == nullptr) {
+    if (!pImpl) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
@@ -129,7 +129,7 @@ Rune String::operator[](Index index) const {
 }
 
 String String::trimStart() const {
-    if (pImpl == nullptr) {
+    if (!pImpl) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
@@ -141,7 +141,7 @@ String String::trimStart() const {
 }
 
 String String::trimEnd() const {
-    if (pImpl == nullptr) {
+    if (!pImpl) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
@@ -176,7 +176,7 @@ String String::stripSuffix(const String& suffix) const {
 }
 
 String String::substring(Size start, Size len) const {
-    if (pImpl == nullptr) {
+    if (!pImpl) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
@@ -203,7 +203,7 @@ String String::substring(Size start, Size len) const {
 }
 
 String String::replace(const String& oldStr, const String& newStr) const {
-    if (pImpl == nullptr) {
+    if (!pImpl) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
@@ -234,7 +234,7 @@ Boolean String::contains(const String &substring) const {
 }
 
 Boolean String::startsWith(const String& prefix) const {
-    if (pImpl == nullptr) {
+    if (!pImpl) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
@@ -243,7 +243,7 @@ Boolean String::startsWith(const String& prefix) const {
 }
 
 Boolean String::endsWith(const String& suffix) const {
-    if (pImpl == nullptr) {
+    if (!pImpl) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
@@ -252,7 +252,7 @@ Boolean String::endsWith(const String& suffix) const {
 }
 
 List<String> String::split(const String& delimiter) const {
-    if (pImpl == nullptr) {
+    if (!pImpl) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
@@ -295,11 +295,9 @@ List<String> String::getLines() const {
 }
 
 Index String::find(const String& substring, Index startIndex) const {
-    if (pImpl == nullptr) {
+    if (!pImpl || !substring.pImpl) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
-
-    if (!pImpl->data.get() || !substring.pImpl->data.get()) return -1;
 
     List<Rune> runes;
     for (Size i = 0; i < pImpl->size; ) {
@@ -369,9 +367,10 @@ String& String::operator=(String&& other) noexcept {
 }
 
 String String::operator+(const String& other) const {
-    if (pImpl == nullptr || other.pImpl == nullptr) {
+    if (!pImpl || !(other.pImpl)) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
+
     Size newSize = this->pImpl->size + other.pImpl->size;
     Byte* newData = static_cast<Byte*>(Memory::allocate(newSize + 1));
     if (newData) {
@@ -388,7 +387,7 @@ String String::operator+=(const String& other) {
 }
 
 bool String::operator==(const String& other) const {
-    if (pImpl == nullptr) {
+    if (!pImpl) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
@@ -400,14 +399,69 @@ bool String::operator!=(const String& other) const {
     return !(*this == other);
 }
 
-Container::Array<Byte> String::toBytes() const noexcept {
+Container::Array<Byte> String::toBytes() const {
+    if (!pImpl) {
+        throw InvalidStateException("Attempt to use a moved-from String object.");
+    }
+
     return {(Byte*) pImpl->data.get(), pImpl->size};
 }
 
-CString String::rawString() const noexcept {
-    return !pImpl ? nullptr : reinterpret_cast<CString>(pImpl->data.get());
+CString String::rawString() const {
+    if (!pImpl) {
+        throw InvalidStateException("Attempt to use a moved-from String object.");
+    }
+
+    return reinterpret_cast<CString>(pImpl->data.get());
 }
 
-Size String::rawLength() const noexcept {
-    return !pImpl ? 0 : pImpl->size;
+Size String::rawLength() const {
+    if (!pImpl) {
+        throw InvalidStateException("Attempt to use a moved-from String object.");
+    }
+
+    return pImpl->size;
+}
+
+Array<wchar_t> String::toWCString() const {
+    if (!pImpl) {
+        throw InvalidStateException("Attempt to use a moved-from String object.");
+    }
+
+#ifdef _WIN32
+    Size utf16Len = 0;
+    Size length = this->length();
+    for (Size i = 0; i < length; ++i) {
+        Rune rune = this->at(i);
+        utf16Len += (rune <= 0xFFFF) ? 1 : 2;
+    }
+
+    Array<wchar_t> wstr(utf16Len + 1);
+
+    Size wstrIndex = 0;
+    for (Size i = 0; i < length; ++i) {
+        Rune rune = this->at(i);
+        if (rune <= 0xFFFF) {
+            wstr[wstrIndex++] = static_cast<wchar_t>(rune);
+        } else {
+            rune -= 0x10000;
+            wstr[wstrIndex++] = static_cast<wchar_t>((rune >> 10) + 0xD800);  // 高代理项
+            wstr[wstrIndex++] = static_cast<wchar_t>((rune & 0x3FF) + 0xDC00);  // 低代理项
+        }
+    }
+    wstr[wstrIndex] = L'\0';
+
+#else
+    Size length = this->length();
+
+    Array<wchar_t> wstr(length + 1);
+
+    for (Size i = 0; i < length; ++i) {
+        Rune rune = this->at(i);
+        wstr[i] = static_cast<wchar_t>(rune);
+    }
+    wstr[length] = L'\0';
+#endif
+
+    return wstr;
 }

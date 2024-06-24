@@ -76,10 +76,12 @@ namespace Cedar::Core {
         Boolean operator==(const String& other) const;
         Boolean operator!=(const String& other) const;
 
-        [[nodiscard]] Container::Array<Byte> toBytes() const noexcept;
+        [[nodiscard]] Container::Array<Byte> toBytes() const;
 
-        [[nodiscard]] CString rawString() const noexcept;
-        [[nodiscard]] Size rawLength() const noexcept;
+        [[nodiscard]] CString rawString() const;
+        [[nodiscard]] Size rawLength() const;
+
+        [[nodiscard]] Container::Array<wchar_t> toWCString() const;
 
         static const Index NPos = -1;
 
