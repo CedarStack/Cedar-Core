@@ -444,6 +444,10 @@ String String::operator+(const String& other) const {
     return {reinterpret_cast<CString>(newData), newSize};
 }
 
+String String::operator+=(const String& other) const {
+    return *this + other;
+}
+
 bool String::operator==(const String& other) const {
     if (pImpl == nullptr) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
