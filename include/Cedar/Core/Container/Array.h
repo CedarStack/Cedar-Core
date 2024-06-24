@@ -26,103 +26,234 @@
 #include <Cedar/Core/BasicTypes.h>
 #include <Cedar/Core/Memory.h>
 #include <Cedar/Core/Threading/Mutex.h>
+#include <Cedar/Core/Threading/LockGuard.h>
 
 #include <Cedar/Core/OutOfRangeException.h>
+#include <initializer_list>
 
 namespace Cedar::Core::Container {
-    template<typename T, Size initialCapacity = 1>
+    template<typename T>
     class Array {
     private:
         T* m_data;
         Size m_size;
         Size m_capacity;
-        Threading::Mutex m_mtx;
+        Memory::Allocator<T> m_allocator;
+        mutable Threading::Mutex m_mtx;
 
         void resize(Size newCapacity) {
-            T* newData = new T[newCapacity];
-            if (m_data) {
-                Memory::copy(newData, m_data, m_size * sizeof(T));
-                delete[] m_data;
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
+            T* newData = m_allocator.allocate(newCapacity);
+            for (Index i = 0; i < m_size; ++i) {
+                m_allocator.construct(newData + i, Memory::move(m_data[i]));
+                m_allocator.destroy(m_data + i);
             }
+            m_allocator.deallocate(m_data);
             m_data = newData;
             m_capacity = newCapacity;
         }
 
     public:
-        Array() : m_data(new T[initialCapacity]), m_size(0), m_capacity(initialCapacity) {}
+        Array() : m_data(nullptr), m_size(0), m_capacity(0) {}
+
+        explicit Array(Size initialCapacity) : m_size(0), m_capacity(initialCapacity) {
+            m_data = m_allocator.allocate(m_capacity);
+        }
 
         Array(const Array& other) {
-            m_mtx.lock();
-            m_data = new T[other.m_capacity];
+            Threading::LockGuard<Threading::Mutex> lock(other.m_mtx);
+            m_data = m_allocator.allocate(other.m_capacity);
             m_size = other.m_size;
             m_capacity = other.m_capacity;
-            Memory::copy(m_data, other.m_data, m_size * sizeof(T));
-            m_mtx.unlock();
+            for (Size i = 0; i < m_size; ++i) {
+                m_allocator.construct(m_data + i, other.m_data[i]);
+            }
+        }
+
+        template<typename Iterable>
+        Array(const Iterable& other) : m_size(other.size()), m_capacity(other.size()) {
+            m_data = m_allocator.allocate(m_capacity);
+            Size index = 0;
+            for (const auto& item : other) {
+                m_allocator.construct(m_data + index++, item);
+            }
+        }
+
+        Array(std::initializer_list<T> initList) : m_size(initList.size()), m_capacity(initList.size()) {
+            m_data = m_allocator.allocate(m_capacity);
+            Index i = 0;
+            for (const T& value : initList) {
+                m_allocator.construct(m_data + i++, value);
+            }
         }
 
         Array& operator=(const Array& other) {
             if (this != &other) {
-                m_mtx.lock();
+                Threading::LockGuard<Threading::Mutex> lock_this(m_mtx), lock_other(other.m_mtx);
                 resize(other.m_capacity);
+                for (Index i = 0; i < other.m_size; ++i) {
+                    m_allocator.construct(m_data + i, other.m_data[i]);
+                }
                 m_size = other.m_size;
-                Memory::copy(m_data, other.m_data, m_size * sizeof(T));
-                m_mtx.unlock();
             }
             return *this;
         }
 
         ~Array() {
-            delete[] m_data;
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
+            for (Index i = 0; i < m_size; ++i) {
+                m_allocator.destroy(m_data + i);
+            }
+            m_allocator.deallocate(m_data);
         }
 
         void append(const T& value) {
-            m_mtx.lock();
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
             if (m_size == m_capacity) {
-                resize(m_capacity * 2);  // Double the capacity when needed
+                resize(m_capacity == 0 ? 1 : m_capacity * 2);
             }
-            m_data[m_size++] = value;
-            m_mtx.unlock();
+            m_allocator.construct(m_data + m_size++, value);
         }
 
         bool remove(const T& value) {
-            m_mtx.lock();
-            for (Size i = 0; i < m_size; i++) {
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
+            for (Index i = 0; i < m_size; i++) {
                 if (m_data[i] == value) {
-                    Memory::copy(m_data + i, m_data + i + 1, (m_size - i - 1) * sizeof(T));
-                    m_size--;
-                    m_mtx.unlock();
+                    m_allocator.destroy(m_data + i);
+                    for (Index j = i; j < m_size - 1; ++j) {
+                        m_allocator.construct(m_data + j, std::move(m_data[j + 1]));
+                        m_allocator.destroy(m_data + j + 1);
+                    }
+                    --m_size;
                     return true;
                 }
             }
-            m_mtx.unlock();
             return false;
         }
 
         void clear() {
-            m_mtx.lock();
-            delete[] m_data;
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
+            for (Index i = 0; i < m_size; ++i) {
+                m_allocator.destroy(m_data + i);
+            }
+            m_allocator.deallocate(m_data);
             m_data = nullptr;
             m_size = 0;
             m_capacity = 0;
-            m_mtx.unlock();
         }
 
-        [[nodiscard]] Size size() const {
+        [[nodiscard]] Index size() const {
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
             return m_size;
         }
 
-        T& operator[](Size index) {
+        [[nodiscard]] T* data() const {
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
+            return m_data;
+        }
+
+        T& operator[](Index index) {
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
             if (index >= m_size) {
                 throw OutOfRangeException("Index out of range");
             }
             return m_data[index];
         }
 
-        const T& operator[](Size index) const {
+        const T& operator[](Index index) const {
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
             if (index >= m_size) {
                 throw OutOfRangeException("Index out of range");
             }
             return m_data[index];
+        }
+
+        class Iterator {
+        private:
+            T* m_ptr;
+        public:
+            explicit Iterator(T* ptr) : m_ptr(ptr) {}
+
+            Iterator& operator++() {
+                ++m_ptr;
+                return *this;
+            }
+
+            Iterator operator++(int) {
+                Iterator tmp = *this;
+                ++m_ptr;
+                return tmp;
+            }
+
+            T& operator*() const {
+                return *m_ptr;
+            }
+
+            T* operator->() const {
+                return m_ptr;
+            }
+
+            bool operator==(const Iterator& other) const {
+                return m_ptr == other.m_ptr;
+            }
+
+            bool operator!=(const Iterator& other) const {
+                return m_ptr != other.m_ptr;
+            }
+        };
+
+        Iterator begin() {
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
+            return Iterator(m_data);
+        }
+
+        Iterator end() {
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
+            return Iterator(m_data + m_size);
+        }
+
+        class ConstIterator {
+        private:
+            const T* m_ptr;
+        public:
+            explicit ConstIterator(const T* ptr) : m_ptr(ptr) {}
+
+            ConstIterator& operator++() {
+                ++m_ptr;
+                return *this;
+            }
+
+            ConstIterator operator++(int) {
+                ConstIterator tmp = *this;
+                ++m_ptr;
+                return tmp;
+            }
+
+            const T& operator*() const {
+                return *m_ptr;
+            }
+
+            const T* operator->() const {
+                return m_ptr;
+            }
+
+            bool operator==(const ConstIterator& other) const {
+                return m_ptr == other.m_ptr;
+            }
+
+            bool operator!=(const ConstIterator& other) const {
+                return m_ptr != other.m_ptr;
+            }
+        };
+
+        ConstIterator begin() const {
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
+            return ConstIterator(m_data);
+        }
+
+        ConstIterator end() const {
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
+            return ConstIterator(m_data + m_size);
         }
     };
 }

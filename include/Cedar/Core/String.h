@@ -72,8 +72,7 @@ namespace Cedar::Core {
         Boolean operator!=(const String& other) const;
 
         [[nodiscard]] CString rawString() const noexcept;
-
-        static Boolean isWhitespace(Rune rune);
+        [[nodiscard]] Size rawLength() const noexcept;
 
         static const Index NPos = -1;
     private:

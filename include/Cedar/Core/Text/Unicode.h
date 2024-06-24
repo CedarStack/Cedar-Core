@@ -23,42 +23,21 @@
 
 #pragma once
 
-namespace Cedar::Core {
-    using Int8 = signed char;
-    using Int16 = short;
-    using Int32 = int;
-    using Int64 = long long;
+#include <Cedar/Core/BasicTypes.h>
+#include <Cedar/Core/String.h>
 
-    using UInt8 = unsigned char;
-    using UInt16 = unsigned short;
-    using UInt32 = unsigned int;
-    using UInt64 = unsigned long long;
+namespace Cedar::Core::Text {
+    class Unicode {
+    public:
+        static Boolean isLetter(Rune codepoint);
+        static Boolean isDigit(Rune codepoint);
+        static Boolean isSpace(Rune codepoint);
 
-    using Float32 = float;
-    using Float64 = double;
+        static Rune toUpperCase(Rune codepoint);
+        static Rune toLowerCase(Rune codepoint);
 
-    using Boolean = bool;
-
-    using Byte = unsigned char;
-    using Rune = char32_t;
-
-    using CString = const char*;
-    using Pointer = void*;
-
-//    using Char = char;
-
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = long long;
-    using USizeType = unsigned long long;
-#else
-    using SizeType = int;
-    using USizeType = unsigned int;
-#endif
-
-    using Size = USizeType;
-    using Index = SizeType;
-    using Hash = SizeType;
-
-    template<typename T>
-    Hash hash(const T& val);
+        static Size calculateRuneLength(Byte firstByte);
+        static Rune extractRuneAt(const Byte *data, Index i);
+        static String encodeRuneToString(Rune codepoint);
+    };
 }

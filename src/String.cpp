@@ -29,162 +29,116 @@
 #include <Cedar/Core/Container/Array.h>
 #include <Cedar/Core/Math/MathFunctions.h>
 
+#include <Cedar/Core/Text/Unicode.h>
+
 using namespace Cedar::Core;
 using namespace Cedar::Core::Container;
+using namespace Cedar::Core::Text;
 
-class BoyerMooreSearch {
-public:
-    static void buildLast(const String &pattern, int last[]) {
-        for (Int32 i = 0; i < 256; ++i) last[i] = -1;
-        for (Int32 i = 0; i < pattern.length(); ++i) {
-            last[pattern.at(i)] = i;
-        }
-    }
+Array<Index> computeKMPTable(const String& pattern) {
+    Size m = pattern.length();
+    Array<Index> lps(m);
+    Size len = 0;
+    lps[0] = 0;
+    Size i = 1;
 
-    static int search(const String &text, const String &pattern) {
-        Int32 last[256];
-        buildLast(pattern, last);
-        Int32 n = text.length();
-        Int32 m = pattern.length();
-        Int32 skip;
+    while (i < m) {
+        Rune runeI = Unicode::extractRuneAt(reinterpret_cast<const Byte *>(pattern.rawString()), i);
+        Rune runeLen = Unicode::extractRuneAt(reinterpret_cast<const Byte *>(pattern.rawString()), len);
 
-        for (Int32 i = 0; i <= n - m; i += skip) {
-            skip = 0;
-            for (Int32 j = m - 1; j >= 0; --j) {
-                if (pattern.at(j) != text.at(i + j)) {
-                    skip = Math::max(1, j - last[text.at(i + j)]);
-                    break;
-                }
+        if (runeI == runeLen) {
+            len++;
+            lps[i] = len;
+            i += Unicode::calculateRuneLength(pattern[i]);
+        } else {
+            if (len != 0) {
+                len = lps[len - 1];
+            } else {
+                lps[i] = 0;
+                i += Unicode::calculateRuneLength(pattern[i]);
             }
-            if (skip == 0) return i; // found
         }
-        return -1; // not found
     }
-};
+    return lps;
+}
+
+Array<Index> KMPSearch(const String& text, const String& pattern) {
+    Array<Index> matches;
+    Array<Index> lps = computeKMPTable(pattern);
+    Size n = text.length();
+    Size m = pattern.length();
+    Index i = 0;
+    Index j = 0;
+
+    while (i < n) {
+        Rune runeI = Unicode::extractRuneAt(reinterpret_cast<const Byte *>(text.rawString()), i);
+        Rune runeJ = (j < m) ? Unicode::extractRuneAt(reinterpret_cast<const Byte *>(pattern.rawString()), j) : 0;
+
+        if (runeI == runeJ) {
+            i += Unicode::calculateRuneLength(text[i]);
+            j += Unicode::calculateRuneLength(pattern[j]);
+        }
+
+        if (j >= m) {
+            matches.append(i - j);
+            j = lps[j - 1];
+        } else if (i < n && runeI != runeJ) {
+            if (j != 0) {
+                j = lps[j - 1];
+            } else {
+                i += Unicode::calculateRuneLength(text[i]);
+            }
+        }
+    }
+    return matches;
+}
 
 struct String::Impl {
-    Byte* data;
+    Memory::UniquePointer<Byte[]> data;
     Size size;
 
-    Impl() : data(nullptr), size(0) {}
+    Impl() : size(0) {}
 
-    explicit Impl(CString str) {
-        if (str) {
-            size = Memory::calcCStringLength(str);
-            data = static_cast<Byte*>(Memory::allocate(size + 1));
-            Memory::copyCString(reinterpret_cast<CString>(data), str);
+    Impl(CString str, Size len) : size(len) {
+        if (str && len > 0) {
+            Byte* rawData = static_cast<Byte*>(Memory::allocate(len + 1));
+            Memory::copy(rawData, (Byte*) str, len);
+            rawData[len] = '\0';
+            data.reset(rawData);
         } else {
             size = 0;
-            data = nullptr;
+            data.reset(nullptr);
         }
     }
 
-    Impl(const Impl& other) {
-        if (other.data) {
-            size = other.size;
-            data = static_cast<Byte*>(Memory::allocate(size + 1));
-            Memory::copyCString(reinterpret_cast<CString>(data), reinterpret_cast<CString>(other.data));
-        } else {
-            data = nullptr;
-            size = 0;
-        }
-    }
+    ~Impl() = default;
 
-    explicit Impl(CString str, Size len) {
-        if (str) {
-            size = len;
-            data = static_cast<Byte*>(Memory::allocate(size + 1));
-            Memory::copy(data, (Pointer) str, size);
-            data[size] = '\0'; // Ensure null termination
-        } else {
-            size = 0;
-            data = nullptr;
-        }
-    }
+//    Impl(Impl&& other) noexcept : data(Memory::move(other.data)), size(other.size) {
+//        other.size = 0;
+//    }
 
-    ~Impl() {
-        Memory::release(data);
-    }
-
-    Impl& operator=(const Impl& other) {
+    Impl& operator=(Impl&& other) noexcept {
         if (this != &other) {
-            Byte* newData = nullptr;
-            if (other.data) {
-                newData = static_cast<Byte*>(Memory::allocate(other.size + 1));
-                Memory::copyCString(reinterpret_cast<CString>(newData), reinterpret_cast<CString>(other.data));
-            }
-            Memory::release(data);
-            data = newData;
+            data = Memory::move(other.data);
             size = other.size;
+            other.size = 0;
         }
         return *this;
-    }
-
-    static Size bytesInRune(Byte firstByte) {
-        if (firstByte < 128) return 1; // 0xxxxxxx
-        else if ((firstByte & 0xE0) == 0xC0) return 2; // 110xxxxx
-        else if ((firstByte & 0xF0) == 0xE0) return 3; // 1110xxxx
-        else if ((firstByte & 0xF8) == 0xF0) return 4; // 11110xxx
-        return 0; // Invalid first byte in a UTF-8 sequence
-    }
-
-    [[nodiscard]] Rune decodeRuneAt(Size i) const {
-        const Byte* bytes = &data[i];
-        Rune rune = 0;
-        Size count = bytesInRune(bytes[0]);
-
-        if (count == 1) {
-            rune = bytes[0];
-        } else if (count == 2) {
-            rune = ((bytes[0] & 0x1F) << 6) | (bytes[1] & 0x3F);
-        } else if (count == 3) {
-            rune = ((bytes[0] & 0x0F) << 12) | ((bytes[1] & 0x3F) << 6) | (bytes[2] & 0x3F);
-        } else if (count == 4) {
-            rune = ((bytes[0] & 0x07) << 18) | ((bytes[1] & 0x3F) << 12) | ((bytes[2] & 0x3F) << 6) | (bytes[3] & 0x3F);
-        }
-
-        return rune;
     }
 };
 
 String::String() : pImpl(new Impl()) {}
 
-String::String(const char* str) : pImpl(new Impl(str)) {}
-
+String::String(CString str) : String(str, Memory::calcCStringLength(str)) {}
 String::String(CString str, Size len) : pImpl(new Impl(str, len)) {}
 
-String::String(const String& other) : pImpl(new Impl(*other.pImpl)) {}
+String::String(const String& other) : String(other.rawString(), other.rawLength()) {}
 
 String::String(String&& other) noexcept : pImpl(other.pImpl) {
     other.pImpl = nullptr;
 }
 
-String::String(Rune rune) {
-// Handle encoding Rune to UTF-8 and store in Impl
-    Byte buffer[5]; // Buffer for UTF-8 encoding, max 4 bytes + null terminator
-    if (rune < 0x80) {
-        buffer[0] = static_cast<Byte>(rune);
-        buffer[1] = '\0';
-    } else if (rune < 0x800) {
-        buffer[0] = 0xC0 | (rune >> 6);
-        buffer[1] = 0x80 | (rune & 0x3F);
-        buffer[2] = '\0';
-    } else if (rune < 0x10000) {
-        buffer[0] = 0xE0 | (rune >> 12);
-        buffer[1] = 0x80 | ((rune >> 6) & 0x3F);
-        buffer[2] = 0x80 | (rune & 0x3F);
-        buffer[3] = '\0';
-    } else if (rune <= 0x10FFFF) {
-        buffer[0] = 0xF0 | (rune >> 18);
-        buffer[1] = 0x80 | ((rune >> 12) & 0x3F);
-        buffer[2] = 0x80 | ((rune >> 6) & 0x3F);
-        buffer[3] = 0x80 | (rune & 0x3F);
-        buffer[4] = '\0';
-    } else {
-        buffer[0] = '\0';  // Invalid rune
-    }
-    pImpl = new Impl(reinterpret_cast<CString>(buffer));
-}
+String::String(Rune rune): String(Unicode::encodeRuneToString(rune)){}
 
 String::~String() {
     delete pImpl;
@@ -195,41 +149,37 @@ Size String::length() const {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
-    if (!pImpl->data) {
+    if (!pImpl->data.get()) {
         return 0;
     }
 
     Size length = 0;
-    Size i = 0;
-    while (i < pImpl->size) {
-        i += Impl::bytesInRune(pImpl->data[i]);
+    for (Size i = 0; i < pImpl->size; i += Unicode::calculateRuneLength(pImpl->data[i])) {
         length++;
     }
 
     return length;
 }
 
-
 Rune String::at(Index index) const {
     if (pImpl == nullptr) {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
+    Size actualLength = this->length();
     if (index < 0) {
-        index += this->length();
+        index += actualLength;
     }
 
-    if (index < 0 || index >= this->length()) {
-        throw OutOfRangeException("Out of range");
+    if (index < 0 || index >= actualLength) {
+        throw OutOfRangeException("Index out of range");
     }
 
     Size charCount = 0;
-    Size i = 0;
-    while (i < pImpl->size) {
+    for (Size i = 0; i < pImpl->size; i += Unicode::calculateRuneLength(pImpl->data[i])) {
         if (charCount == index) {
-            return pImpl->decodeRuneAt(i);
+            return Unicode::extractRuneAt(pImpl->data.get(), i);
         }
-        i += Impl::bytesInRune(pImpl->data[i]);
         charCount++;
     }
 
@@ -246,10 +196,10 @@ String String::trimStart() const {
     }
 
     Size i = 0;
-    while (i < pImpl->size && isWhitespace(pImpl->data[i])) {
-        i += Impl::bytesInRune(pImpl->data[i]); // Advance by rune, not byte
+    while (i < pImpl->size && Unicode::isSpace(pImpl->data[i])) {
+        i += Unicode::calculateRuneLength(pImpl->data[i]); // Advance by rune, not byte
     }
-    return {reinterpret_cast<CString>(pImpl->data + i), pImpl->size - i};
+    return {reinterpret_cast<CString>(pImpl->data.get() + i), pImpl->size - i};
 }
 
 String String::trimEnd() const {
@@ -261,10 +211,10 @@ String String::trimEnd() const {
     while (i > 0) {
         Size prev = i - 1;
         while (prev > 0 && (pImpl->data[prev] & 0xC0) == 0x80) prev--; // Move back to the start of the rune
-        if (!isWhitespace(pImpl->data[prev])) break;
+        if (!Unicode::isSpace(pImpl->data[prev])) break;
         i = prev;
     }
-    return {reinterpret_cast<CString>(pImpl->data), i};
+    return {reinterpret_cast<CString>(pImpl->data.get()), i};
 }
 
 String String::trim() const {
@@ -274,17 +224,17 @@ String String::trim() const {
 String String::stripPrefix(const String& prefix) const {
     if (this->startsWith(prefix)) {
         Size newLen = pImpl->size - prefix.pImpl->size;
-        return {reinterpret_cast<CString>(pImpl->data + prefix.pImpl->size), newLen};
+        return {reinterpret_cast<CString>(pImpl->data.get() + prefix.pImpl->size), newLen};
     }
-    return *this; // Return original string if no prefix found
+    return *this;
 }
 
 String String::stripSuffix(const String& suffix) const {
     if (this->endsWith(suffix)) {
         Size newLen = pImpl->size - suffix.pImpl->size;
-        return {reinterpret_cast<CString>(pImpl->data), newLen};
+        return {reinterpret_cast<CString>(pImpl->data.get()), newLen};
     }
-    return *this; // Return original string if no suffix found
+    return *this;
 }
 
 String String::substring(Size start, Size len) const {
@@ -292,22 +242,25 @@ String String::substring(Size start, Size len) const {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
-    List<Rune> runes;
-    for (Size i = 0; i < pImpl->size; ) {
-        Rune rune = pImpl->decodeRuneAt(i);
-        runes.append(rune);
-        i += Impl::bytesInRune(pImpl->data[i]);
+    Size numRunes = 0, startPos = 0;
+    Size actualLength = 0;
+
+    for (Size i = 0; numRunes < start && i < pImpl->size; numRunes++) {
+        i += Unicode::calculateRuneLength(pImpl->data[i]);
+        startPos = i;
     }
 
-    if (start >= runes.size()) {
+    if (numRunes < start) {
         throw OutOfRangeException("Start index is out of range");
     }
 
-    Size actualLength = (len == NPos || start + len > runes.size()) ? runes.size() - start : len;
     String result;
-    for (Size i = start; i < start + actualLength; ++i) {
-        result = result + String(runes[i]);
+    for (Size i = startPos; i < pImpl->size && (len == NPos || actualLength < len); actualLength++) {
+        Rune rune = Unicode::extractRuneAt(pImpl->data.get(), i);
+        result = result + String(rune);
+        i += Unicode::calculateRuneLength(pImpl->data[i]);
     }
+
     return result;
 }
 
@@ -348,7 +301,7 @@ Boolean String::startsWith(const String& prefix) const {
     }
 
     if (prefix.pImpl->size > pImpl->size) return false;
-    return Memory::compare(pImpl->data, prefix.pImpl->data, prefix.pImpl->size) == 0;
+    return Memory::compare(pImpl->data.get(), prefix.pImpl->data.get(), prefix.pImpl->size) == 0;
 }
 
 Boolean String::endsWith(const String& suffix) const {
@@ -357,7 +310,7 @@ Boolean String::endsWith(const String& suffix) const {
     }
 
     if (suffix.pImpl->size > pImpl->size) return false;
-    return Memory::compare(pImpl->data + (pImpl->size - suffix.pImpl->size), suffix.pImpl->data, suffix.pImpl->size) == 0;
+    return Memory::compare(pImpl->data.get() + (pImpl->size - suffix.pImpl->size), suffix.pImpl->data.get(), suffix.pImpl->size) == 0;
 }
 
 List<String> String::split(const String& delimiter) const {
@@ -368,19 +321,19 @@ List<String> String::split(const String& delimiter) const {
     List<String> result;
     Size delimiterLength = delimiter.pImpl->size;
     if (delimiterLength == 0) {
-        result.append(String(reinterpret_cast<const char*>(pImpl->data), pImpl->size));
+        result.append(String(reinterpret_cast<const char*>(pImpl->data.get()), pImpl->size));
         return result;
     }
 
-    const Byte* start = pImpl->data;
-    const Byte* end = pImpl->data + pImpl->size;
+    const Byte* start = pImpl->data.get();
+    const Byte* end = pImpl->data.get() + pImpl->size;
     const Byte* current = start;
 
     while (current < end) {
         const Byte* found = nullptr;
         for (Size i = 0; i <= (end - current - delimiterLength); ++i) {
             if (Memory::compare((Pointer) reinterpret_cast<CString>(current + i),
-                                (Pointer) reinterpret_cast<CString>(delimiter.pImpl->data), delimiterLength) == 0) {
+                                (Pointer) reinterpret_cast<CString>(delimiter.pImpl->data.get()), delimiterLength) == 0) {
                 found = current + i;
                 break;
             }
@@ -408,20 +361,20 @@ Index String::find(const String& substring, Index startIndex) const {
         throw InvalidStateException("Attempt to use a moved-from String object.");
     }
 
-    if (!pImpl->data || !substring.pImpl->data) return -1;
+    if (!pImpl->data.get() || !substring.pImpl->data.get()) return -1;
 
     List<Rune> runes;
     for (Size i = 0; i < pImpl->size; ) {
-        Rune rune = pImpl->decodeRuneAt(i);
+        Rune rune = Unicode::extractRuneAt(pImpl->data.get(), i);
         runes.append(rune);
-        i += Impl::bytesInRune(pImpl->data[i]);
+        i += Unicode::calculateRuneLength(pImpl->data[i]);
     }
 
     List<Rune> subRunes;
     for (Size i = 0; i < substring.pImpl->size; ) {
-        Rune rune = substring.pImpl->decodeRuneAt(i);
+        Rune rune = Unicode::extractRuneAt(substring.pImpl->data.get(), i);
         subRunes.append(rune);
-        i += Impl::bytesInRune(substring.pImpl->data[i]);
+        i += Unicode::calculateRuneLength(substring.pImpl->data[i]);
     }
 
     int thisSize = runes.size();
@@ -463,7 +416,7 @@ Index String::find(const String& substring, Index startIndex) const {
 
 String& String::operator=(const String& other) {
     if (this != &other) {
-        *pImpl = *other.pImpl;
+        *pImpl = Memory::move(*other.pImpl);
     }
     return *this;
 }
@@ -484,8 +437,8 @@ String String::operator+(const String& other) const {
     Size newSize = this->pImpl->size + other.pImpl->size;
     Byte* newData = static_cast<Byte*>(Memory::allocate(newSize + 1));
     if (newData) {
-        Memory::copy(newData, this->pImpl->data, this->pImpl->size);
-        Memory::copy(newData + this->pImpl->size, other.pImpl->data, other.pImpl->size);
+        Memory::copy(newData, this->pImpl->data.get(), this->pImpl->size);
+        Memory::copy(newData + this->pImpl->size, other.pImpl->data.get(), other.pImpl->size);
         newData[newSize] = '\0';
     }
     return {reinterpret_cast<CString>(newData), newSize};
@@ -497,7 +450,7 @@ bool String::operator==(const String& other) const {
     }
 
     return this->pImpl->size == other.pImpl->size &&
-           Memory::compare(this->pImpl->data, other.pImpl->data, this->pImpl->size) == 0;
+           Memory::compare(this->pImpl->data.get(), other.pImpl->data.get(), this->pImpl->size) == 0;
 }
 
 bool String::operator!=(const String& other) const {
@@ -505,38 +458,9 @@ bool String::operator!=(const String& other) const {
 }
 
 CString String::rawString() const noexcept {
-    return !pImpl ? nullptr : reinterpret_cast<CString>(pImpl->data);
+    return !pImpl ? nullptr : reinterpret_cast<CString>(pImpl->data.get());
 }
 
-bool String::isWhitespace(Rune rune) {
-    switch (rune) {
-        case 0x09: // Character TABULATION
-        case 0x0A: // LINE FEED
-        case 0x0B: // VERTICAL TAB
-        case 0x0C: // FORM FEED
-        case 0x0D: // CARRIAGE RETURN
-        case 0x20: // SPACE
-        case 0x85: // NEXT LINE (NEL)
-        case 0xA0: // NO-BREAK SPACE
-        case 0x1680: // OGHAM SPACE MARK
-        case 0x2000: // EN QUAD
-        case 0x2001: // EM QUAD
-        case 0x2002: // EN SPACE
-        case 0x2003: // EM SPACE
-        case 0x2004: // THREE-PER-EM SPACE
-        case 0x2005: // FOUR-PER-EM SPACE
-        case 0x2006: // SIX-PER-EM SPACE
-        case 0x2007: // FIGURE SPACE
-        case 0x2008: // PUNCTUATION SPACE
-        case 0x2009: // THIN SPACE
-        case 0x200A: // HAIR SPACE
-        case 0x2028: // LINE SEPARATOR
-        case 0x2029: // PARAGRAPH SEPARATOR
-        case 0x202F: // NARROW NO-BREAK SPACE
-        case 0x205F: // MEDIUM MATHEMATICAL SPACE
-        case 0x3000: // IDEOGRAPHIC SPACE
-            return true;
-        default:
-            return false;
-    }
+Size String::rawLength() const noexcept {
+    return !pImpl ? 0 : pImpl->size;
 }

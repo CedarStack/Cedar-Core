@@ -21,44 +21,43 @@
  * SOFTWARE.
  */
 
-#pragma once
+#include <gtest/gtest.h>
+#include <Cedar/Core/Container/HashMap.h>
 
-namespace Cedar::Core {
-    using Int8 = signed char;
-    using Int16 = short;
-    using Int32 = int;
-    using Int64 = long long;
+namespace Cedar::Core::Container {
+    TEST(HashMapTest, InsertAndFind) {
+        HashMap<int, std::string, 10> map;
 
-    using UInt8 = unsigned char;
-    using UInt16 = unsigned short;
-    using UInt32 = unsigned int;
-    using UInt64 = unsigned long long;
+        map.insert(1, "one");
+        map.insert(2, "two");
+        map.insert(3, "three");
 
-    using Float32 = float;
-    using Float64 = double;
+        EXPECT_EQ(*map.find(1), "one");
+        EXPECT_EQ(*map.find(2), "two");
+        EXPECT_EQ(*map.find(3), "three");
+        EXPECT_EQ(map.find(4), nullptr);
+    }
 
-    using Boolean = bool;
+    TEST(HashMapTest, Delete) {
+        HashMap<int, std::string, 10> map;
 
-    using Byte = unsigned char;
-    using Rune = char32_t;
+        map.insert(1, "one");
+        map.insert(2, "two");
 
-    using CString = const char*;
-    using Pointer = void*;
+        EXPECT_TRUE(map.remove(1));
+        EXPECT_EQ(map.find(1), nullptr);
+        EXPECT_NE(map.find(2), nullptr);
+        EXPECT_FALSE(map.remove(1));
+    }
 
-//    using Char = char;
+    TEST(HashMapTest, Clear) {
+        HashMap<int, std::string, 10> map;
 
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = long long;
-    using USizeType = unsigned long long;
-#else
-    using SizeType = int;
-    using USizeType = unsigned int;
-#endif
+        map.insert(1, "one");
+        map.insert(2, "two");
+        map.clear();
 
-    using Size = USizeType;
-    using Index = SizeType;
-    using Hash = SizeType;
-
-    template<typename T>
-    Hash hash(const T& val);
+        EXPECT_EQ(map.find(1), nullptr);
+        EXPECT_EQ(map.find(2), nullptr);
+    }
 }

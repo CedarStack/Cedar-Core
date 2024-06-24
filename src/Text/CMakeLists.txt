@@ -3,13 +3,6 @@
 # See the LICENSE file in the project root for full license information.
 
 target_sources(Cedar PRIVATE
-        BasicHashDefinitions.cpp
-        Exception.cpp
-        String.cpp
-        Memory.cpp
+        Unicode.cpp
+        Unicode/UnicodeTables.cpp
 )
-
-add_subdirectory(IO)
-add_subdirectory(Math)
-add_subdirectory(Text)
-add_subdirectory(Threading)

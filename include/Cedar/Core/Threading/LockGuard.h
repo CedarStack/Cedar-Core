@@ -23,42 +23,22 @@
 
 #pragma once
 
-namespace Cedar::Core {
-    using Int8 = signed char;
-    using Int16 = short;
-    using Int32 = int;
-    using Int64 = long long;
+namespace Cedar::Core::Threading {
+    template<typename Lock>
+    class LockGuard {
+    public:
+        explicit LockGuard(Lock& m) : m_lock(m) {
+            m_lock.lock();
+        }
 
-    using UInt8 = unsigned char;
-    using UInt16 = unsigned short;
-    using UInt32 = unsigned int;
-    using UInt64 = unsigned long long;
+        ~LockGuard() {
+            m_lock.unlock();
+        }
 
-    using Float32 = float;
-    using Float64 = double;
+        LockGuard(const LockGuard&) = delete;
+        LockGuard& operator=(const LockGuard&) = delete;
 
-    using Boolean = bool;
-
-    using Byte = unsigned char;
-    using Rune = char32_t;
-
-    using CString = const char*;
-    using Pointer = void*;
-
-//    using Char = char;
-
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = long long;
-    using USizeType = unsigned long long;
-#else
-    using SizeType = int;
-    using USizeType = unsigned int;
-#endif
-
-    using Size = USizeType;
-    using Index = SizeType;
-    using Hash = SizeType;
-
-    template<typename T>
-    Hash hash(const T& val);
+    private:
+        Lock& m_lock;
+    };
 }

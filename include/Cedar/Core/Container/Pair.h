@@ -23,42 +23,36 @@
 
 #pragma once
 
-namespace Cedar::Core {
-    using Int8 = signed char;
-    using Int16 = short;
-    using Int32 = int;
-    using Int64 = long long;
+#include <Cedar/Core/Memory.h>
 
-    using UInt8 = unsigned char;
-    using UInt16 = unsigned short;
-    using UInt32 = unsigned int;
-    using UInt64 = unsigned long long;
+namespace Cedar::Core::Container {
 
-    using Float32 = float;
-    using Float64 = double;
+    template<typename T1, typename T2>
+    class Pair {
+    public:
+        T1 first;
+        T2 second;
 
-    using Boolean = bool;
+        Pair() : first(T1()), second(T2()) {}
 
-    using Byte = unsigned char;
-    using Rune = char32_t;
+        Pair(const T1& x, const T2& y) : first(x), second(y) {}
+        Pair(const Pair& other) : first(other.first), second(other.second) {}
+        Pair(Pair&& other) noexcept : first(Memory::move(other.first)), second(Memory::move(other.second)) {}
 
-    using CString = const char*;
-    using Pointer = void*;
+        Pair& operator=(const Pair& other) {
+            if (this != &other) {
+                first = other.first;
+                second = other.second;
+            }
+            return *this;
+        }
 
-//    using Char = char;
-
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = long long;
-    using USizeType = unsigned long long;
-#else
-    using SizeType = int;
-    using USizeType = unsigned int;
-#endif
-
-    using Size = USizeType;
-    using Index = SizeType;
-    using Hash = SizeType;
-
-    template<typename T>
-    Hash hash(const T& val);
+        Pair& operator=(Pair&& other) noexcept {
+            if (this != &other) {
+                first = Memory::move(other.first);
+                second = Memory::move(other.second);
+            }
+            return *this;
+        }
+    };
 }
