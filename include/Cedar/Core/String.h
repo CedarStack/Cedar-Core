@@ -29,6 +29,9 @@ namespace Cedar::Core {
     namespace Container {
         template<typename T>
         class List;
+
+        template<typename T>
+        class Array;
     }
 
     class String {
@@ -71,6 +74,8 @@ namespace Cedar::Core {
         String operator+=(const String& other);
         Boolean operator==(const String& other) const;
         Boolean operator!=(const String& other) const;
+
+        [[nodiscard]] Container::Array<Byte> toBytes() const noexcept;
 
         [[nodiscard]] CString rawString() const noexcept;
         [[nodiscard]] Size rawLength() const noexcept;

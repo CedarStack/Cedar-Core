@@ -60,6 +60,14 @@ namespace Cedar::Core::Container {
             m_data = m_allocator.allocate(m_capacity);
         }
 
+        Array(T* src, Size length) : m_size(length), m_capacity(length) {
+            Threading::LockGuard<Threading::Mutex> lock(m_mtx);
+            m_data = m_allocator.allocate(m_capacity);
+            for (Size i = 0; i < m_size; ++i) {
+                m_allocator.construct(m_data + i, Memory::move(src[i]));
+            }
+        }
+
         Array(const Array& other) {
             Threading::LockGuard<Threading::Mutex> lock(other.m_mtx);
             m_data = m_allocator.allocate(other.m_capacity);

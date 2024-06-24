@@ -462,6 +462,10 @@ bool String::operator!=(const String& other) const {
     return !(*this == other);
 }
 
+Container::Array<Byte> String::toBytes() const noexcept {
+    return {(Byte*) pImpl->data.get(), pImpl->size};
+}
+
 CString String::rawString() const noexcept {
     return !pImpl ? nullptr : reinterpret_cast<CString>(pImpl->data.get());
 }
