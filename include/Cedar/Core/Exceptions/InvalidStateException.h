@@ -23,26 +23,13 @@
 
 #pragma once
 
-#include <exception>
-#include <Cedar/Core/BasicTypes.h>
+#include <Cedar/Core/Exceptions/Exception.h>
 
 namespace Cedar::Core {
-    class String;
-
-    class Exception : public std::exception {
+    class InvalidStateException: public Exception {
     public:
-        explicit Exception(const String &message);
-        explicit Exception(CString message);
+        explicit InvalidStateException(const String& message): Exception(message) {}
+        explicit InvalidStateException(CString message): Exception(message) {}
 
-        ~Exception();
-
-        String getMessage() const noexcept;
-
-        const char *what() const noexcept override;
-
-    private:
-        class Impl;
-
-        Impl *pImpl;
     };
 }

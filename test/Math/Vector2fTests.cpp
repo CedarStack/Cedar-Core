@@ -22,110 +22,123 @@
  */
 
 #include <gtest/gtest.h>
-#include "Cedar/Core/String.h"
-#include "Cedar/Core/OutOfRangeException.h"
-#include "Cedar/Core/Container/List.h"
+#include <Cedar/Core/String.h>
+#include <Cedar/Core/Container/List.h>
 
-#include "Cedar/Core/Math/Vector.h"
+#include <Cedar/Core/Math/Vector.h>
 
-namespace Cedar::Core {
+namespace Cedar::Core::Math {
 
-// Vector2 float
+    // Test the default constructor
     TEST(VectorTest, DefaultConstructor) {
-        Math::Vec2f v2f{};
-        EXPECT_EQ(v2f[0], 0.0f);
+        Vec2f v2f{};
+        EXPECT_FLOAT_EQ(v2f[0], 0.0f);
+        EXPECT_FLOAT_EQ(v2f[1], 0.0f); // Added to test the second component as well
     }
 
+    // Test the parameterized constructor
     TEST(VectorTest, ArgsConstructor) {
-        Math::Vec2f v2f(1.0f, 3.2f);
-        EXPECT_EQ(v2f[0], 1.0f);
-        EXPECT_EQ(v2f[1], 3.2f);
+        Vec2f v2f(1.0f, 3.2f);
+        EXPECT_FLOAT_EQ(v2f[0], 1.0f);
+        EXPECT_FLOAT_EQ(v2f[1], 3.2f);
     }
 
-    TEST(VectorTest, PositiveOp) {
-        Math::Vec2f v2f(-2.4f, 6.7f);
+    // Test addition operator
+    TEST(Vector3dTest, AddOp) {
+        Math::Vec3d v3d_0(-2.4, 6.7, 24.3);
+        Math::Vec3d v3d_1(-12.73, -7.31, 337.21);
 
-        Math::Vec2f temp = +v2f;
+        Math::Vec3d temp = v3d_0 + v3d_1;
 
-        EXPECT_EQ(temp[0], 2.4f);
-        EXPECT_EQ(temp[1], 6.7f);
+        EXPECT_NEAR(temp[0], -15.13, 0.00001);
+        EXPECT_NEAR(temp[1], -0.61, 0.00001);
+        EXPECT_NEAR(temp[2], 361.51, 0.00001);
     }
 
-    TEST(VectorTest, NegativeOp) {
-        Math::Vec2f v2f(-2.4f, 6.7f);
+    // Test unary negative operator
+    TEST(Vector3dTest, NegativeOp) {
+        Math::Vec3d v3d(-2.4, 6.7, -24.2);
 
-        Math::Vec2f temp = -v2f;
+        Math::Vec3d temp = -v3d;
 
-        EXPECT_EQ(temp[0], 2.4f);
-        EXPECT_EQ(temp[1], -6.7f);
+        EXPECT_NEAR(temp[0], 2.4, 0.00001);
+        EXPECT_NEAR(temp[1], -6.7, 0.00001);
+        EXPECT_NEAR(temp[2], 24.2, 0.00001);
     }
 
+    // Test addition operator
     TEST(VectorTest, AddOp) {
-        Math::Vec2f v2f_0(-2.4f, 6.7f);
-        Math::Vec2f v2f_1(-12.73f, -7.31f);
+        Vec2f v2f_0(-2.4f, 6.7f);
+        Vec2f v2f_1(-12.73f, -7.31f);
 
-        Math::Vec2f temp = v2f_0 + v2f_1;
+        Vec2f temp = v2f_0 + v2f_1;
 
-        EXPECT_EQ(temp[0], (-2.4f + -12.73f));
-        EXPECT_EQ(temp[1], (6.7f + -7.31f));
+        EXPECT_FLOAT_EQ(temp[0], (-2.4f + -12.73f));
+        EXPECT_FLOAT_EQ(temp[1], (6.7f + -7.31f));
     }
 
+    // Test subtraction operator
     TEST(VectorTest, SubOp) {
-        Math::Vec2f v2f_0(-2.4f, 6.7f);
-        Math::Vec2f v2f_1(-12.73f, -7.31f);
+        Vec2f v2f_0(-2.4f, 6.7f);
+        Vec2f v2f_1(-12.73f, -7.31f);
 
-        Math::Vec2f temp = v2f_0 - v2f_1;
+        Vec2f temp = v2f_0 - v2f_1;
 
-        EXPECT_EQ(temp[0], (-2.4f - -12.73f));
-        EXPECT_EQ(temp[1], (6.7f - -7.31f));
+        EXPECT_FLOAT_EQ(temp[0], (-2.4f - -12.73f));
+        EXPECT_FLOAT_EQ(temp[1], (6.7f - -7.31f));
     }
 
+    // Test multiplication operator (component-wise multiplication)
     TEST(VectorTest, MulOp) {
-        Math::Vec2f v2f_0(-2.4f, 6.7f);
-        Math::Vec2f v2f_1(-12.73f, -7.31f);
+        Vec2f v2f_0(-2.4f, 6.7f);
+        Vec2f v2f_1(-12.73f, -7.31f);
 
-        Math::Vec2f temp = v2f_0 * v2f_1;
+        Vec2f temp = v2f_0 * v2f_1;
 
-        EXPECT_EQ(temp[0], (-2.4f * -12.73f));
-        EXPECT_EQ(temp[1], (6.7f * -7.31f));
+        EXPECT_FLOAT_EQ(temp[0], (-2.4f * -12.73f));
+        EXPECT_FLOAT_EQ(temp[1], (6.7f * -7.31f));
     }
 
+    // Test division operator (component-wise division)
     TEST(VectorTest, DivOp) {
-        Math::Vec2f v2f_0(-2.4f, 6.7f);
-        Math::Vec2f v2f_1(-12.73f, -7.31f);
+        Vec2f v2f_0(-2.4f, 6.7f);
+        Vec2f v2f_1(-12.73f, -7.31f);
 
-        Math::Vec2f temp = v2f_0 / v2f_1;
+        Vec2f temp = v2f_0 / v2f_1;
 
-        EXPECT_EQ(temp[0], (-2.4f / -12.73f));
-        EXPECT_EQ(temp[1], (6.7f / -7.31f));
+        EXPECT_FLOAT_EQ(temp[0], (-2.4f / -12.73f));
+        EXPECT_FLOAT_EQ(temp[1], (6.7f / -7.31f));
     }
 
+    // Test equality operator
     TEST(VectorTest, EqualOp) {
-        Math::Vec2f v2f_0(-2.4f, 6.7f);
-        Math::Vec2f v2f_1(-12.73f, -7.31f);
-        Boolean temp = v2f_0 == v2f_1;
-        EXPECT_EQ(temp, false);
+        Vec2f v2f_0(-2.4f, 6.7f);
+        Vec2f v2f_1(-12.73f, -7.31f);
+        bool temp = v2f_0 == v2f_1;
+        EXPECT_FALSE(temp);
 
-        Math::Vec2f v2f_2(-2.4f, 6.7f);
-        Math::Vec2f v2f_3(-2.4f, 6.7f);
-        Boolean temp_1 = v2f_2 == v2f_3;
-        EXPECT_EQ(temp_1, true);
+        Vec2f v2f_2(-2.4f, 6.7f);
+        Vec2f v2f_3(-2.4f, 6.7f);
+        bool temp_1 = v2f_2 == v2f_3;
+        EXPECT_TRUE(temp_1);
     }
 
+    // Test inequality operator
     TEST(VectorTest, InverseEqualOp) {
-        Math::Vec2f v2f_0(-2.4f, 6.7f);
-        Math::Vec2f v2f_1(-12.73f, -7.31f);
-        Boolean temp = v2f_0 != v2f_1;
-        EXPECT_EQ(temp, true);
+        Vec2f v2f_0(-2.4f, 6.7f);
+        Vec2f v2f_1(-12.73f, -7.31f);
+        bool temp = v2f_0 != v2f_1;
+        EXPECT_TRUE(temp);
 
-        Math::Vec2f v2f_2(-2.4f, 6.7f);
-        Math::Vec2f v2f_3(-2.4f, 6.7f);
-        Boolean temp_1 = v2f_2 != v2f_3;
-        EXPECT_EQ(temp_1, false);
+        Vec2f v2f_2(-2.4f, 6.7f);
+        Vec2f v2f_3(-2.4f, 6.7f);
+        bool temp_1 = v2f_2 != v2f_3;
+        EXPECT_FALSE(temp_1);
     }
 
+    // Test length calculation
     TEST(VectorTest, Length) {
-        Math::Vec2f v2f(3.0f, 4.0f);
-        EXPECT_FLOAT_EQ(v2f.length(), 5.0f);
+        Vec2f v2f(3.0f, 4.0f);
+        EXPECT_FLOAT_EQ(v2f.length(), 5.0f); // Right triangle with sides 3 and 4 has hypotenuse 5
     }
 }

@@ -103,4 +103,4 @@ namespace Cedar::Core {
         struct Impl;
         Impl* pImpl;
     };
-}  // namespace Cedar::Core
+}

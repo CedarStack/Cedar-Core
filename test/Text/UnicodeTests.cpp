@@ -25,91 +25,97 @@
 #include <Cedar/Core/Text/Unicode.h>
 
 namespace Cedar::Core::Text {
+
+    // Tests whether various characters are correctly identified as letters.
     TEST(UnicodeTest, IsLetter) {
-        // 阿拉伯字母
-        EXPECT_TRUE(Unicode::isLetter(0x0627));  // 'ا' (阿拉伯字母)
+        // Arabic letter
+        EXPECT_TRUE(Unicode::isLetter(0x0627));  // 'ا' (Arabic letter Alef)
 
-        // 希腊字母
-        EXPECT_TRUE(Unicode::isLetter(0x0391));  // 'Α' (希腊大写字母 Alpha)
-        EXPECT_TRUE(Unicode::isLetter(0x03B1));  // 'α' (希腊小写字母 Alpha)
+        // Greek letters
+        EXPECT_TRUE(Unicode::isLetter(0x0391));  // 'Α' (Greek Capital Letter Alpha)
+        EXPECT_TRUE(Unicode::isLetter(0x03B1));  // 'α' (Greek Small Letter Alpha)
 
-        // 法语字母
-        EXPECT_TRUE(Unicode::isLetter(0x00E9));  // 'é' (法语字母)
+        // French letter with diacritic
+        EXPECT_TRUE(Unicode::isLetter(0x00E9));  // 'é' (French letter é)
 
-        // 西里尔字母
-        EXPECT_TRUE(Unicode::isLetter(0x0410));  // 'А' (西里尔大写字母 A)
-        EXPECT_TRUE(Unicode::isLetter(0x0430));  // 'а' (西里尔小写字母 a)
+        // Cyrillic letters
+        EXPECT_TRUE(Unicode::isLetter(0x0410));  // 'А' (Cyrillic Capital Letter A)
+        EXPECT_TRUE(Unicode::isLetter(0x0430));  // 'а' (Cyrillic Small Letter a)
 
-        // 非字母
+        // Non-letter characters
         EXPECT_FALSE(Unicode::isLetter(0x0031)); // '1'
-        EXPECT_FALSE(Unicode::isLetter(0x0020)); // ' '
-        EXPECT_FALSE(Unicode::isLetter(0x4E16)); // '世'
+        EXPECT_FALSE(Unicode::isLetter(0x0020)); // Space character
+        EXPECT_FALSE(Unicode::isLetter(0x4E16)); // Chinese character '世'
     }
 
+    // Tests whether various characters are correctly identified as digits.
     TEST(UnicodeTest, IsDigit) {
-        // 阿拉伯数字
+        // Arabic numerals
         EXPECT_TRUE(Unicode::isDigit(0x0031));   // '1'
-        EXPECT_TRUE(Unicode::isDigit(0x0661));   // '١' (阿拉伯-印度数字 1)
+        EXPECT_TRUE(Unicode::isDigit(0x0661));   // '١' (Arabic-Indic Digit One)
 
-        // 罗马数字
-        EXPECT_FALSE(Unicode::isDigit(0x2160));  // 'Ⅰ' (罗马数字 1)
+        // Roman numeral
+        EXPECT_FALSE(Unicode::isDigit(0x2160));  // 'Ⅰ' (Roman Numeral One)
 
-        // 非数字
+        // Non-digit characters
         EXPECT_FALSE(Unicode::isDigit(0x0041));  // 'A'
         EXPECT_FALSE(Unicode::isDigit(0x0061));  // 'a'
-        EXPECT_FALSE(Unicode::isDigit(0x0020));  // ' '
-        EXPECT_FALSE(Unicode::isDigit(0x4E16));  // '世'
+        EXPECT_FALSE(Unicode::isDigit(0x0020));  // Space character
+        EXPECT_FALSE(Unicode::isDigit(0x4E16));  // Chinese character '世'
     }
 
+    // Tests whether various characters are correctly identified as whitespace.
     TEST(UnicodeTest, IsSpace) {
-        // 常见空白字符
-        EXPECT_TRUE(Unicode::isSpace(0x0020));   // ' '
-        EXPECT_TRUE(Unicode::isSpace(0x0009));   // '\t' (Tab)
-        EXPECT_TRUE(Unicode::isSpace(0x000A));   // '\n' (Newline)
-        EXPECT_TRUE(Unicode::isSpace(0x000D));   // '\r' (Carriage Return)
+        // Common whitespace characters
+        EXPECT_TRUE(Unicode::isSpace(0x0020));   // Space character
+        EXPECT_TRUE(Unicode::isSpace(0x0009));   // Horizontal tab
+        EXPECT_TRUE(Unicode::isSpace(0x000A));   // Line feed
+        EXPECT_TRUE(Unicode::isSpace(0x000D));   // Carriage return
 
-        // 非空白字符
+        // Non-space characters
         EXPECT_FALSE(Unicode::isSpace(0x0041));  // 'A'
         EXPECT_FALSE(Unicode::isSpace(0x0061));  // 'a'
         EXPECT_FALSE(Unicode::isSpace(0x0031));  // '1'
-        EXPECT_FALSE(Unicode::isSpace(0x4E16));  // '世'
+        EXPECT_FALSE(Unicode::isSpace(0x4E16));  // Chinese character '世'
     }
 
+    // Tests conversion of characters to uppercase.
     TEST(UnicodeTest, ToUpperCase) {
-        // ASCII
-        EXPECT_EQ(Unicode::toUpperCase(0x0041), 0x0041); // 'A' -> 'A'
-        EXPECT_EQ(Unicode::toUpperCase(0x0061), 0x0041); // 'a' -> 'A'
+        // ASCII characters
+        EXPECT_EQ(Unicode::toUpperCase(0x0041), 0x0041); // 'A' to 'A'
+        EXPECT_EQ(Unicode::toUpperCase(0x0061), 0x0041); // 'a' to 'A'
 
-        // 希腊字母
-        EXPECT_EQ(Unicode::toUpperCase(0x03B1), 0x0391); // 'α' -> 'Α'
+        // Greek letters
+        EXPECT_EQ(Unicode::toUpperCase(0x03B1), 0x0391); // 'α' to 'Α'
 
-        // 法语字母
-        EXPECT_EQ(Unicode::toUpperCase(0x00E9), 0x00C9); // 'é' -> 'É'
+        // French letter with diacritic
+        EXPECT_EQ(Unicode::toUpperCase(0x00E9), 0x00C9); // 'é' to 'É'
 
-        // 西里尔字母
-        EXPECT_EQ(Unicode::toUpperCase(0x0430), 0x0410); // 'а' -> 'А'
+        // Cyrillic letters
+        EXPECT_EQ(Unicode::toUpperCase(0x0430), 0x0410); // 'а' to 'А'
 
-        // 非字母字符
-        EXPECT_EQ(Unicode::toUpperCase(0x0031), 0x0031); // '1' -> '1'
-        EXPECT_EQ(Unicode::toUpperCase(0x4E16), 0x4E16); // '世' -> '世' (unchanged)
+        // Non-letter characters unchanged
+        EXPECT_EQ(Unicode::toUpperCase(0x0031), 0x0031); // '1' unchanged
+        EXPECT_EQ(Unicode::toUpperCase(0x4E16), 0x4E16); // Chinese character '世' unchanged
     }
 
+    // Tests conversion of characters to lowercase.
     TEST(UnicodeTest, ToLowerCase) {
-        // ASCII
-        EXPECT_EQ(Unicode::toLowerCase(0x0041), 0x0061); // 'A' -> 'a'
-        EXPECT_EQ(Unicode::toLowerCase(0x0061), 0x0061); // 'a' -> 'a'
+        // ASCII characters
+        EXPECT_EQ(Unicode::toLowerCase(0x0041), 0x0061); // 'A' to 'a'
+        EXPECT_EQ(Unicode::toLowerCase(0x0061), 0x0061); // 'a' to 'a'
 
-        // 希腊字母
-        EXPECT_EQ(Unicode::toLowerCase(0x0391), 0x03B1); // 'Α' -> 'α'
+        // Greek letters
+        EXPECT_EQ(Unicode::toLowerCase(0x0391), 0x03B1); // 'Α' to 'α'
 
-        // 法语字母
-        EXPECT_EQ(Unicode::toLowerCase(0x00C9), 0x00E9); // 'É' -> 'é'
+        // French letter with diacritic
+        EXPECT_EQ(Unicode::toLowerCase(0x00C9), 0x00E9); // 'É' to 'é'
 
-        // 西里尔字母
-        EXPECT_EQ(Unicode::toLowerCase(0x0410), 0x0430); // 'А' -> 'а'
+        // Cyrillic letters
+        EXPECT_EQ(Unicode::toLowerCase(0x0410), 0x0430); // 'А' to 'а'
 
-        // 非字母字符
-        EXPECT_EQ(Unicode::toLowerCase(0x0031), 0x0031); // '1' -> '1'
-        EXPECT_EQ(Unicode::toLowerCase(0x4E16), 0x4E16); // '世' -> '世' (unchanged)
+        // Non-letter characters unchanged
+        EXPECT_EQ(Unicode::toLowerCase(0x0031), 0x0031); // '1' unchanged
+        EXPECT_EQ(Unicode::toLowerCase(0x4E16), 0x4E16); // Chinese character '世' unchanged
     }
 }

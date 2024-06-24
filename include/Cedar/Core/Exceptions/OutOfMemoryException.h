@@ -23,13 +23,12 @@
 
 #pragma once
 
-#include <Cedar/Core/Exception.h>
+#include <Cedar/Core/Exceptions/Exception.h>
 
 namespace Cedar::Core {
-    class InvalidStateException: public Exception {
+    class OutOfMemoryException: public Exception {
     public:
-        explicit InvalidStateException(const String& message): Exception(message) {}
-        explicit InvalidStateException(CString message): Exception(message) {}
-
+        explicit OutOfMemoryException(const String& message): Exception(message) {}
+        explicit OutOfMemoryException(CString message): Exception(message) {}
     };
 }

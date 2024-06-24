@@ -24,6 +24,7 @@
 #include <Cedar/Core/IO/Path.h>
 
 using namespace Cedar::Core;
+using namespace Cedar::Core::Container;
 using namespace Cedar::Core::IO;
 
 const String pathSeparator = "/";
@@ -60,23 +61,23 @@ Path::~Path() {
 }
 
 String Path::getFileName() const {
-    Size pos = pImpl->path.find("/", -1);
+    Index pos = pImpl->path.find("/", -1);
     return pos != String::NPos ? pImpl->path.substring(pos + 1) : pImpl->path;
 }
 
 String Path::getFileType() const {
-    Size pos = pImpl->path.find('.', -1);
+    Index pos = pImpl->path.find('.', -1);
     return pos != String::NPos ? pImpl->path.substring(pos) : String();
 }
 
 Path Path::getParent() const {
-    Size pos = pImpl->path.find(pathSeparator, -1);
+    Index pos = pImpl->path.find(pathSeparator, -1);
     return pos != String::NPos ? Path(pImpl->path.substring(0, pos)) : Path();
 }
 
 String Path::getRoot() const {
     if (isAbsolute()) {
-        Size pos = pImpl->path.find(pathSeparator);
+        Index pos = pImpl->path.find(pathSeparator);
         if (pos != String::NPos) {
             return pImpl->path.substring(0, pos);
         }
@@ -90,16 +91,16 @@ Boolean Path::isAbsolute() const {
 
 Size Path::calculateDepth() const {
     Size depth = 0;
-    Size start = 0;
+    Index start = 0;
     while ((start = pImpl->path.find(pathSeparator, start + 1)) != String::NPos) {
         depth++;
     }
     return depth;
 }
 
-Container::List<Path> Path::decomposeList() const {
-    Container::List<Path> parts;
-    Size start = 0, end;
+List<Path> Path::decomposeList() const {
+    List<Path> parts;
+    Index start = 0, end;
 
     while ((end = pImpl->path.find(pathSeparator, start)) != String::NPos) {
         if (end != start) {

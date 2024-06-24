@@ -27,33 +27,52 @@
 
 #include <Cedar/Core/Math/MathFunctions.h>
 
-namespace Cedar::Core {
+namespace Cedar::Core::Math {
 
+    // Tests to ensure the absolute value function has precision comparable to std::abs
     TEST(MathFunctionsTest, AbsPrecision) {
+        // Tests for integer and long long
         EXPECT_EQ(Math::abs(-42), std::abs(-42));
         EXPECT_EQ(Math::abs(-42LL), std::abs(-42LL));
+
+        // Tests for floating-point numbers
         EXPECT_FLOAT_EQ(Math::abs(-42.0f), std::abs(-42.0f));
         EXPECT_DOUBLE_EQ(Math::abs(-42.0), std::abs(-42.0));
     }
 
+    // Measures the time taken to execute a function repeatedly
     double MeasureTime(std::function<double(double)> func, double value) {
         auto start = std::chrono::high_resolution_clock::now();
-        func(value);
+        for (int i = 0; i < 100000; ++i) {
+            func(value);  // Call function repeatedly to get a measurable time duration
+        }
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> duration = end - start;
         return duration.count();
     }
 
+    // Tests to verify that the custom square root function matches the standard library's results
     TEST(MathFunctionsTest, SqrtTest) {
+        // Test sqrt for perfect squares
         EXPECT_DOUBLE_EQ(Math::sqrt(4.0), std::sqrt(4.0));
         EXPECT_DOUBLE_EQ(Math::sqrt(9.0), std::sqrt(9.0));
         EXPECT_DOUBLE_EQ(Math::sqrt(16.0), std::sqrt(16.0));
+
+        // Test sqrt for Pi
         EXPECT_DOUBLE_EQ(Math::sqrt(M_PI), std::sqrt(M_PI));
 
+        // Test sqrt for edge cases
         EXPECT_DOUBLE_EQ(Math::sqrt(0.0), std::sqrt(0.0));
         EXPECT_DOUBLE_EQ(Math::sqrt(1.0), std::sqrt(1.0));
 
+        // Test sqrt for negative number (should return NaN)
         EXPECT_TRUE(std::isnan(Math::sqrt(-1.0)));
     }
 
+    // Optional: Adding a performance test for sqrt function
+    TEST(MathFunctionsTest, SqrtPerformance) {
+        auto customTime = MeasureTime(Math::sqrt, 16.0);
+        auto stdTime = MeasureTime([](double x) -> double { return std::sqrt(x); } , 16.0);
+        std::cout << "Custom sqrt time: " << customTime << ", Standard sqrt time: " << stdTime << std::endl;
+    }
 }

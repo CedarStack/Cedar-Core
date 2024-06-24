@@ -62,11 +62,7 @@ namespace Cedar::Core::Math {
         }
 
         Vector operator+() const {
-            Vector result = *this;
-            for (Index i = 0; i < S; ++i) {
-                result.m_array[i] = std::abs(m_array[i]);
-            }
-            return result;
+            return *this;
         }
 
         Vector operator-() const {

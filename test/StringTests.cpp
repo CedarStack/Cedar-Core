@@ -23,97 +23,89 @@
 
 #include <gtest/gtest.h>
 #include <Cedar/Core/String.h>
-#include <Cedar/Core/OutOfRangeException.h>
 #include <Cedar/Core/Container/List.h>
-#include <Cedar/Core/InvalidStateException.h>
+#include <Cedar/Core/Exceptions/InvalidStateException.h>
 
 namespace Cedar::Core {
-// Test default constructor
+
+    // Tests default constructor of the String class.
     TEST(StringTest, DefaultConstructor) {
         String str;
         EXPECT_EQ(str.length(), 0);
         EXPECT_TRUE(str.rawString() == nullptr);
     }
 
-// Test constructor from C string
+    // Tests the constructor that initializes with a C-style string.
     TEST(StringTest, ConstructFromCString) {
         String str("hello");
         EXPECT_EQ(str.length(), 5);
         EXPECT_STREQ(str.rawString(), "hello");
     }
 
-// Test copy constructor
+    // Tests the copy constructor for correctness.
     TEST(StringTest, CopyConstructor) {
         String original("test");
         String copy(original);
         EXPECT_EQ(copy, original);
     }
 
-// Test move constructor
+    // Tests the move constructor ensuring the original object's state post-move.
     TEST(StringTest, MoveConstructor) {
         String original("move");
         String moved(std::move(original));
 
-        // Check that the moved-to object has the correct length
         EXPECT_EQ(moved.length(), 4);
-
-        // Check that accessing the moved-from object throws an exception
-        try {
-            original.length();  // This should throw an exception
-            FAIL() << "Expected InvalidStateException";
-        } catch (InvalidStateException const & err) {
-            EXPECT_EQ(err.what(), std::string("Attempt to use a moved-from String object."));
-        } catch (...) {
-            FAIL() << "Expected InvalidStateException";
-        }
-
-        // Alternatively, check for nullptr directly if that's how you handle moved-from state
         EXPECT_TRUE(original.rawString() == nullptr);
+
+        // Verify InvalidStateException is thrown when using the moved-from object.
+        EXPECT_THROW(original.length(), InvalidStateException);
     }
 
-// Test for Unicode support
+    // Tests handling of Unicode characters in strings.
     TEST(StringTest, UnicodeHandling) {
         String unicode("你好🌍");
         EXPECT_EQ(unicode.length(), 3);
-        EXPECT_TRUE(std::string(unicode.rawString()) == "你好🌍");
+        EXPECT_STREQ(unicode.rawString(), "你好🌍");
     }
 
-// Test emojis
+    // Tests proper counting and retrieval of emojis as single characters.
     TEST(StringTest, EmojiHandling) {
         String emoji("😊👍");
-        EXPECT_EQ(emoji.length(), 2); // Assumes UTF-8 where each emoji is 4 bytes
-        EXPECT_TRUE(std::string(emoji.rawString()) == "😊👍");
+        EXPECT_EQ(emoji.length(), 2);
+        EXPECT_STREQ(emoji.rawString(), "😊👍");
     }
 
+    // Tests string access using both positive and negative indices.
     TEST(StringTest, AccessWithPositiveAndNegativeIndices) {
         String testStr(u8"Hello, 世界! 👋");
 
-        // Test positive indices
-        EXPECT_EQ(testStr.at(0), 'H');   // First character
-        EXPECT_EQ(testStr.at(7), u'世');  // First Chinese character
-        EXPECT_EQ(testStr.at(11), String("👋")[0]); // Emoji
+        // Positive indices
+        EXPECT_EQ(testStr.at(0), 'H');
+        EXPECT_EQ(testStr.at(7), u'世');
+        EXPECT_EQ(testStr.at(11), U'👋');
 
-        // Test negative indices
-        EXPECT_EQ(testStr.at(-1), String("👋")[0]); // Last character (Emoji)
-        EXPECT_EQ(testStr.at(-3), '!');  // Before Emoji
-        EXPECT_EQ(testStr.at(-4), u'界'); // Second Chinese character
+        // Negative indices
+        EXPECT_EQ(testStr.at(-1), U'👋');
+        EXPECT_EQ(testStr.at(-3), '!');
+        EXPECT_EQ(testStr.at(-4), u'界');
 
-        // Test out-of-range access should throw an exception
-        EXPECT_THROW(testStr.at(testStr.length()), OutOfRangeException);   // Access beyond valid range
-        EXPECT_THROW(testStr.at(-testStr.length() - 1), OutOfRangeException); // Access beyond the start
+        // Out-of-range access
+        EXPECT_THROW(testStr.at(testStr.length()), OutOfRangeException);
+        EXPECT_THROW(testStr.at(-testStr.length() - 1), OutOfRangeException);
     }
 
-// Test string operations
+    // Tests various string manipulation operations.
     TEST(StringTest, StringOperations) {
         String s("  trim me  ");
         EXPECT_EQ(s.trim(), "trim me");
+
         String prefix("unimportant");
         String important("important");
         EXPECT_TRUE(important.startsWith(prefix.stripPrefix("un")));
         EXPECT_TRUE(important.endsWith("tant"));
     }
 
-// Test splitting strings
+    // Tests string splitting into substrings.
     TEST(StringTest, SplitStrings) {
         String s("one,two,three");
         auto parts = s.split(",");
@@ -123,28 +115,25 @@ namespace Cedar::Core {
         EXPECT_EQ(parts[2], "three");
     }
 
-    TEST(StringTests, SubstringUnicode) {
+    // Tests substring extraction with Unicode characters.
+    TEST(StringTest, SubstringUnicode) {
         String text("Hello, 世界🌏!");
 
         String sub = text.substring(7, 3);
-        ASSERT_EQ(std::string(sub.rawString()), "世界🌏");
+        ASSERT_STREQ(sub.rawString(), "世界🌏");
 
-        // Substring that starts with an Emoji
         sub = text.substring(9, 2);
-        ASSERT_EQ(std::string(sub.rawString()), "🌏!");
+        ASSERT_STREQ(sub.rawString(), "🌏!");
 
-        // Substring with only part of the string (avoiding Unicode characters)
         sub = text.substring(0, 5);
-        ASSERT_EQ(std::string(sub.rawString()), "Hello");
+        ASSERT_STREQ(sub.rawString(), "Hello");
 
-        // Out of range start index
         EXPECT_THROW(text.substring(15, 1), OutOfRangeException);
-
-        // Length extends beyond the end of the string
-        sub = text.substring(7, 10); // Should handle this gracefully
-        ASSERT_EQ(std::string(sub.rawString()), "世界🌏!");
+        sub = text.substring(7, 10);
+        ASSERT_STREQ(sub.rawString(), "世界🌏!");
     }
 
+    // Tests string replacement functionality.
     TEST(StringTest, ReplaceMethod) {
         String original("hello world");
         String result = original.replace("world", "there");
@@ -166,6 +155,7 @@ namespace Cedar::Core {
         ASSERT_EQ(result, "hello 🌏");
     }
 
+    // Tests string search and position finding.
     TEST(StringFindTest, Find) {
         String asciiStr("Hello, World!");
         EXPECT_EQ(asciiStr.find(String("World")), 7);
@@ -187,6 +177,5 @@ namespace Cedar::Core {
         EXPECT_EQ(pathStr.find(String("/"), -1), 8);
         EXPECT_EQ(pathStr.find(String("/"), 1), 4);
         EXPECT_EQ(pathStr.find(String("/"), 0), 0);
-
     }
-}  // namespace Cedar::Core
+}

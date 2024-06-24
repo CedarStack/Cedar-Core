@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <Cedar/Core/Exception.h>
+#include <Cedar/Core/Exceptions/Exception.h>
 
 namespace Cedar::Core {
     class OutOfRangeException: public Exception {

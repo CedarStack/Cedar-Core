@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-#include <Cedar/Core/Exception.h>
+#include <Cedar/Core/Exceptions/Exception.h>
 #include <Cedar/Core/Memory.h>
 #include <Cedar/Core/String.h>
 

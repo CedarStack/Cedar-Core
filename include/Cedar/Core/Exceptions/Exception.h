@@ -23,12 +23,26 @@
 
 #pragma once
 
-#include <Cedar/Core/Exception.h>
+#include <exception>
+#include "Cedar/Core/BasicTypes.h"
 
 namespace Cedar::Core {
-    class OutOfMemoryException: public Exception {
+    class String;
+
+    class Exception : public std::exception {
     public:
-        explicit OutOfMemoryException(const String& message): Exception(message) {}
-        explicit OutOfMemoryException(CString message): Exception(message) {}
+        explicit Exception(const String &message);
+        explicit Exception(CString message);
+
+        ~Exception();
+
+        String getMessage() const noexcept;
+
+        const char *what() const noexcept override;
+
+    private:
+        class Impl;
+
+        Impl *pImpl;
     };
 }

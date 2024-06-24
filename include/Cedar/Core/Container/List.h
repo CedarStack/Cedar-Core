@@ -26,7 +26,7 @@
 #include <Cedar/Core/BasicTypes.h>
 #include <Cedar/Core/Threading/Mutex.h>
 
-#include <Cedar/Core/OutOfRangeException.h>
+#include <Cedar/Core/Exceptions/OutOfRangeException.h>
 
 namespace Cedar::Core::Container {
     template<typename T>

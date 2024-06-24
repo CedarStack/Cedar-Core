@@ -25,49 +25,58 @@
 #include <Cedar/Core/IO/Path.h>
 
 namespace Cedar::Core::IO {
+    // Test the default constructor to ensure it initializes an empty path correctly.
     TEST(PathTest, DefaultConstructor) {
         Path p;
-        EXPECT_EQ(p.toString(), "");
+        EXPECT_EQ(p.toString(), "");  // The path should be empty initially.
     }
 
+    // Test the parameterized constructor to check path normalization from backslashes to slashes.
     TEST(PathTest, ParameterConstructorAndNormalize) {
         Path p("C:\\Users\\Test\\File.txt");
-        EXPECT_EQ(p.toString(), "C:/Users/Test/File.txt");
+        EXPECT_EQ(p.toString(), "C:/Users/Test/File.txt");  // Path should be normalized to forward slashes.
     }
 
+    // Test extraction of the file name from a full path.
     TEST(PathTest, GetFileName) {
         Path p("C:/Users/Test/File.txt");
-        EXPECT_EQ(p.getFileName(), "File.txt");
+        EXPECT_EQ(p.getFileName(), "File.txt");  // Only the file name should be returned.
     }
 
+    // Test extraction of the file extension from a full path.
     TEST(PathTest, GetFileType) {
         Path p("C:/Users/Test/File.txt");
-        EXPECT_EQ(p.getFileType(), ".txt");
+        EXPECT_EQ(p.getFileType(), ".txt");  // Only the file extension should be returned.
     }
 
+    // Test getting the parent directory of a file path.
     TEST(PathTest, GetParent) {
         Path p("C:/Users/Test/File.txt");
-        EXPECT_EQ(p.getParent().toString(), "C:/Users/Test");
+        EXPECT_EQ(p.getParent().toString(), "C:/Users/Test");  // Parent path should be everything except the file.
     }
 
+    // Test extraction of the root component from a path.
     TEST(PathTest, GetRoot) {
         Path p("C:/Users/Test/File.txt");
-        EXPECT_EQ(p.getRoot(), "C:");
+        EXPECT_EQ(p.getRoot(), "C:");  // The root of the path should be "C:".
     }
 
+    // Test if the path is recognized as absolute.
     TEST(PathTest, IsAbsolute) {
         Path p("C:/Users/Test/File.txt");
-        EXPECT_TRUE(p.isAbsolute());
+        EXPECT_TRUE(p.isAbsolute());  // This should be recognized as an absolute path.
 
         Path relativePath("Users/Test/File.txt");
-        EXPECT_FALSE(relativePath.isAbsolute());
+        EXPECT_FALSE(relativePath.isAbsolute());  // This should be recognized as a relative path.
     }
 
+    // Test calculating the depth of a path, based on its components.
     TEST(PathTest, CacuDepth) {
         Path p("C:/Users/Test/File.txt");
-        EXPECT_EQ(p.calculateDepth(), 3);
+        EXPECT_EQ(p.calculateDepth(), 3);  // Depth is the number of elements in the path.
     }
 
+    // Test decomposing a path into a list of all its hierarchical components.
     TEST(PathTest, DecomposeList) {
         Path p("C:/Users/Test/File.txt");
         auto parts = p.decomposeList();
@@ -78,6 +87,7 @@ namespace Cedar::Core::IO {
         EXPECT_EQ(parts[3].toString(), "C:/Users/Test/File.txt");
     }
 
+    // Test accessing individual path segments.
     TEST(PathTest, PathSegment) {
         Path p("C:/Users/Test/File.txt");
         EXPECT_EQ(p[0].toString(), "C:");

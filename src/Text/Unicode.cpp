@@ -22,7 +22,6 @@
  */
 
 #include <Cedar/Core/Text/Unicode.h>
-#include <Cedar/Core/BasicTypes.h>
 
 #include "./Unicode/UnicodeTables.h"
 
@@ -31,7 +30,7 @@ using namespace Cedar::Core::Container;
 using namespace Cedar::Core::Text;
 
 Boolean isInRanges(UInt32 codepoint, const Array<UnicodeRange>& ranges) {
-    for (Size i = 0; i < ranges.size(); ++i) {
+    for (Index i = 0; i < ranges.size(); ++i) {
         if (codepoint >= ranges[i].start && codepoint <= ranges[i].end) {
             return true;
         }

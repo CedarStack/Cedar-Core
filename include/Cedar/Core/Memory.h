@@ -24,7 +24,7 @@
 #pragma once
 
 #include <Cedar/Core/BasicTypes.h>
-#include <Cedar/Core/OutOfMemoryException.h>
+#include <Cedar/Core/Exceptions/OutOfMemoryException.h>
 
 namespace Cedar::Core::Memory {
     void copy(Pointer target, Pointer source, Size size);

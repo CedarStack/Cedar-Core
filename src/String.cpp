@@ -23,75 +23,16 @@
 
 #include <Cedar/Core/String.h>
 #include <Cedar/Core/Memory.h>
-#include <Cedar/Core/InvalidStateException.h>
-#include <Cedar/Core/OutOfRangeException.h>
+#include <Cedar/Core/Exceptions/InvalidStateException.h>
+#include <Cedar/Core/Exceptions/OutOfRangeException.h>
 #include <Cedar/Core/Container/List.h>
 #include <Cedar/Core/Container/Array.h>
-#include <Cedar/Core/Math/MathFunctions.h>
 
 #include <Cedar/Core/Text/Unicode.h>
 
 using namespace Cedar::Core;
 using namespace Cedar::Core::Container;
 using namespace Cedar::Core::Text;
-
-Array<Index> computeKMPTable(const String& pattern) {
-    Size m = pattern.length();
-    Array<Index> lps(m);
-    Size len = 0;
-    lps[0] = 0;
-    Size i = 1;
-
-    while (i < m) {
-        Rune runeI = Unicode::extractRuneAt(reinterpret_cast<const Byte *>(pattern.rawString()), i);
-        Rune runeLen = Unicode::extractRuneAt(reinterpret_cast<const Byte *>(pattern.rawString()), len);
-
-        if (runeI == runeLen) {
-            len++;
-            lps[i] = len;
-            i += Unicode::calculateRuneLength(pattern[i]);
-        } else {
-            if (len != 0) {
-                len = lps[len - 1];
-            } else {
-                lps[i] = 0;
-                i += Unicode::calculateRuneLength(pattern[i]);
-            }
-        }
-    }
-    return lps;
-}
-
-Array<Index> KMPSearch(const String& text, const String& pattern) {
-    Array<Index> matches;
-    Array<Index> lps = computeKMPTable(pattern);
-    Size n = text.length();
-    Size m = pattern.length();
-    Index i = 0;
-    Index j = 0;
-
-    while (i < n) {
-        Rune runeI = Unicode::extractRuneAt(reinterpret_cast<const Byte *>(text.rawString()), i);
-        Rune runeJ = (j < m) ? Unicode::extractRuneAt(reinterpret_cast<const Byte *>(pattern.rawString()), j) : 0;
-
-        if (runeI == runeJ) {
-            i += Unicode::calculateRuneLength(text[i]);
-            j += Unicode::calculateRuneLength(pattern[j]);
-        }
-
-        if (j >= m) {
-            matches.append(i - j);
-            j = lps[j - 1];
-        } else if (i < n && runeI != runeJ) {
-            if (j != 0) {
-                j = lps[j - 1];
-            } else {
-                i += Unicode::calculateRuneLength(text[i]);
-            }
-        }
-    }
-    return matches;
-}
 
 struct String::Impl {
     Memory::UniquePointer<Byte[]> data;

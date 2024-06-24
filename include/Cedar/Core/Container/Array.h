@@ -28,7 +28,7 @@
 #include <Cedar/Core/Threading/Mutex.h>
 #include <Cedar/Core/Threading/LockGuard.h>
 
-#include <Cedar/Core/OutOfRangeException.h>
+#include <Cedar/Core/Exceptions/OutOfRangeException.h>
 #include <initializer_list>
 
 namespace Cedar::Core::Container {
@@ -129,7 +129,7 @@ namespace Cedar::Core::Container {
                 if (m_data[i] == value) {
                     m_allocator.destroy(m_data + i);
                     for (Index j = i; j < m_size - 1; ++j) {
-                        m_allocator.construct(m_data + j, std::move(m_data[j + 1]));
+                        m_allocator.construct(m_data + j, Memory::move(m_data[j + 1]));
                         m_allocator.destroy(m_data + j + 1);
                     }
                     --m_size;
