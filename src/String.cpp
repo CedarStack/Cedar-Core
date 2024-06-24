@@ -113,10 +113,6 @@ struct String::Impl {
 
     ~Impl() = default;
 
-//    Impl(Impl&& other) noexcept : data(Memory::move(other.data)), size(other.size) {
-//        other.size = 0;
-//    }
-
     Impl& operator=(Impl&& other) noexcept {
         if (this != &other) {
             data = Memory::move(other.data);
@@ -131,6 +127,7 @@ String::String() : pImpl(new Impl()) {}
 
 String::String(CString str) : String(str, Memory::calcCStringLength(str)) {}
 String::String(CString str, Size len) : pImpl(new Impl(str, len)) {}
+String::String(const Array<Byte>& byteArray): String((CString) byteArray.data(), byteArray.size()) {}
 
 String::String(const String& other) : String(other.rawString(), other.rawLength()) {}
 

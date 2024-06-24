@@ -41,6 +41,7 @@ namespace Cedar::Core {
         //NOLINTNEXTLINE
         String(CString string);
         String(CString str, Size len);
+        String(const Container::Array<Byte>& byteArray);
         String(const String& other);
         String(String&& other) noexcept;
         String(Rune rune);
@@ -81,6 +82,23 @@ namespace Cedar::Core {
         [[nodiscard]] Size rawLength() const noexcept;
 
         static const Index NPos = -1;
+
+// TODO
+//        class Iterator {
+//        public:
+//            Iterator(const Byte* ptr, const Byte* end);
+//            Iterator& operator++();
+//            Iterator operator++(int);
+//            Rune operator*() const ;
+//            bool operator!=(const Iterator& other) const;
+//            bool operator==(const Iterator& other) const;
+//        private:
+//            const Byte* ptr;
+//            const Byte* end;
+//        };
+//        Iterator begin() const;
+//        Iterator end() const;
+
     private:
         struct Impl;
         Impl* pImpl;
