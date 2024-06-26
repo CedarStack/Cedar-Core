@@ -46,11 +46,11 @@ Please note that Cedar-Core is still in the early stages of development and is r
 ## 📫 How to Contribute
 If you are interested in contributing to the development of Cedar-Core, please follow these steps:
 
-Fork the repository
-Create your feature branch (git checkout -b feature/AmazingFeature)
-Commit your changes (git commit -m 'Add some AmazingFeature')
-Push to the branch (git push origin feature/AmazingFeature)
-Open a Pull Request
+- Fork the repository
+- Create your feature branch (git checkout -b feature/AmazingFeature)
+- Commit your changes (git commit -m 'Add some AmazingFeature')
+- Push to the branch (git push origin feature/AmazingFeature)
+- Open a Pull Request
 
 ## 🤝 Contributors
 Thank you to all the developers who have contributed to Cedar-Stack:
