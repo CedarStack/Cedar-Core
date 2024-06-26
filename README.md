@@ -13,12 +13,12 @@ Cedar-Stack is a new and early-stage C++ framework currently under active develo
 ## Cedar-Core Module
 Cedar-Core is the core component of the Cedar-Stack framework, encompassing the following key features:
 
-Math: Provides basic and advanced mathematical computation capabilities.
-IO: Simplifies file and network I/O operations.
-Network: Supports the implementation of network communications.
-String: Enhanced string operations, supporting a wide range of character sets.
-Threading: Provides multi-threading capabilities to optimize performance and resource management.
-Serialization: Supports data serialization and deserialization, including but not limited to JSON and XML formats.
+- Math: Provides basic and advanced mathematical computation capabilities.
+- IO: Simplifies file and network I/O operations.
+- Network: Supports the implementation of network communications.
+- String: Enhanced string operations, supporting a wide range of character sets.
+- Threading: Provides multi-threading capabilities to optimize performance and resource management.
+- Serialization: Supports data serialization and deserialization, including but not limited to JSON and XML formats.
 
 ### Current Progress and Goals
 Development of Cedar-Core is proceeding according to the following plan:
