@@ -50,8 +50,8 @@ namespace Cedar::Core {
 
         [[nodiscard]] Size length() const;
 
-        [[nodiscard]] Rune at(Index index) const;
-        [[nodiscard]] Rune operator[](Index index) const;
+        [[nodiscard]] Rune at(SSize index) const;
+        [[nodiscard]] Rune operator[](SSize index) const;
 
         [[nodiscard]] String trim() const;
         [[nodiscard]] String trimStart() const;
@@ -67,12 +67,11 @@ namespace Cedar::Core {
 
         [[nodiscard]] Container::List<String> split(const String& delimiter) const;
         [[nodiscard]] Container::List<String> getLines() const;
-        [[nodiscard]] Index find(const String& substring, Index startIndex = 0) const;
+        [[nodiscard]] SSize find(const String& substring, SSize startIndex = 0) const;
 
         String& operator=(const String& other);
         String& operator=(String&& other) noexcept;
         String operator+(const String& other) const;
-        String operator+=(const String& other);
         Boolean operator==(const String& other) const;
         Boolean operator!=(const String& other) const;
 
@@ -83,7 +82,7 @@ namespace Cedar::Core {
 
         [[nodiscard]] Container::Array<wchar_t> toWCString() const;
 
-        static const Index NPos = -1;
+        static const SSize NPos = -1;
 
 // TODO
 //        class Iterator {
@@ -104,5 +103,7 @@ namespace Cedar::Core {
     private:
         struct Impl;
         Impl* pImpl;
+
+        void checkValidState() const;
     };
 }

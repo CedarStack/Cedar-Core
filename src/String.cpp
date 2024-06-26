@@ -34,81 +34,92 @@ using namespace Cedar::Core;
 using namespace Cedar::Core::Container;
 using namespace Cedar::Core::Text;
 
+// Internal implementation class for encapsulating string data and operations
 struct String::Impl {
-    Memory::UniquePointer<Byte[]> data;
-    Size size;
+    Memory::UniquePointer<Byte[]> data; // Pointer to string data
+    Size size;                          // Byte length of the string
+    Size runeCount;                     // Count of Unicode runes in the string
 
-    Impl() : size(0) {}
+    Impl() : size(0), runeCount(0) {}
 
-    Impl(CString str, Size len) : size(len) {
-        if (str && len > 0) {
-            Byte* rawData = static_cast<Byte*>(Memory::allocate(len + 1));
-            Memory::copy(rawData, (Byte*) str, len);
-            rawData[len] = '\0';
-            data.reset(rawData);
-        } else {
-            size = 0;
-            data.reset(nullptr);
+    Impl(const char* str, Size len) : size(len), runeCount(0) {
+        str = str ? str : "";
+        data.reset(static_cast<Byte *>(Memory::allocate(len + 1)));
+        Memory::copy(data.get(), (Byte *) str, len);
+        data[len] = '\0'; // Null terminate for safety
+        calculateRuneCount();
+    }
+
+    Impl(const Impl& other) : size(other.size), runeCount(other.runeCount) {
+        if (size >= 0) {
+            data.reset(static_cast<Byte*>(Memory::allocate(size + 1)));
+            Memory::copy(data.get(), other.data.get(), size);
+            data[size] = '\0';
         }
     }
 
     ~Impl() = default;
 
-    Impl& operator=(Impl&& other) noexcept {
+    void checkValidState() const {
+        if (!data.get()) throw InvalidStateException("Invalid state: object has been moved or is uninitialized.");
+    }
+
+    void calculateRuneCount() {
+        runeCount = 0;
+        for (Size i = 0; i < size; i += Unicode::calculateRuneLength(data[i])) {
+            ++runeCount;
+        }
+    }
+
+    Impl& operator=(const Impl& other) {
         if (this != &other) {
-            data = Memory::move(other.data);
+            data.reset(new Byte[other.size + 1]);
+            Memory::copy(data.get(), other.data.get(), other.size + 1);
             size = other.size;
-            other.size = 0;
+            runeCount = other.runeCount;
         }
         return *this;
     }
 };
 
-String::String() : pImpl(new Impl()) {}
+String::String() : pImpl(new Impl("", 0)) {}
 
 String::String(CString str) : String(str, Memory::calcCStringLength(str)) {}
+
 String::String(CString str, Size len) : pImpl(new Impl(str, len)) {}
-String::String(const Array<Byte>& byteArray): String((CString) byteArray.data(), byteArray.size()) {}
 
-String::String(const String& other) : String(other.rawString(), other.rawLength()) {}
+String::String(const Container::Array<Byte>& byteArray): String(reinterpret_cast<CString>(byteArray.data()), byteArray.size()) {}
 
-String::String(String&& other) noexcept : pImpl(other.pImpl) {
+String::String(Rune rune): String(Unicode::encodeRuneToString(rune)) {}
+
+String::String(const String& other) : pImpl(new Impl(*other.pImpl)) {}
+
+String::String(String&& other) noexcept : pImpl(std::move(other.pImpl)) {
     other.pImpl = nullptr;
 }
-
-String::String(Rune rune): String(Unicode::encodeRuneToString(rune)){}
 
 String::~String() {
     delete pImpl;
 }
 
-Size String::length() const {
-    if (!pImpl) {
+void String::checkValidState() const {
+    if (!pImpl)
         throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
-
-    if (!pImpl->data.get()) {
-        return 0;
-    }
-
-    Size length = 0;
-    for (Size i = 0; i < pImpl->size; i += Unicode::calculateRuneLength(pImpl->data[i])) {
-        length++;
-    }
-
-    return length;
+    pImpl->checkValidState();
 }
 
-Rune String::at(Index index) const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
+Size String::length() const {
+    checkValidState();
+    return pImpl->runeCount;
+}
+
+Rune String::at(SSize index) const {
+    checkValidState();
 
     Size actualLength = this->length();
     if (index < 0) {
         index += actualLength;
     }
-
     if (index < 0 || index >= actualLength) {
         throw OutOfRangeException("Index out of range");
     }
@@ -121,17 +132,15 @@ Rune String::at(Index index) const {
         charCount++;
     }
 
-    return 0;
+    return 0; // Should never reach here if checks are correct
 }
 
-Rune String::operator[](Index index) const {
+Rune String::operator[](SSize index) const {
     return this->at(index);
 }
 
 String String::trimStart() const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
+    checkValidState();
 
     Size i = 0;
     while (i < pImpl->size && Unicode::isSpace(pImpl->data[i])) {
@@ -141,9 +150,7 @@ String String::trimStart() const {
 }
 
 String String::trimEnd() const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
+    checkValidState();
 
     Size i = pImpl->size;
     while (i > 0) {
@@ -176,9 +183,7 @@ String String::stripSuffix(const String& suffix) const {
 }
 
 String String::substring(Size start, Size len) const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
+    checkValidState();
 
     Size numRunes = 0, startPos = 0;
     Size actualLength = 0;
@@ -203,9 +208,7 @@ String String::substring(Size start, Size len) const {
 }
 
 String String::replace(const String& oldStr, const String& newStr) const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
+    checkValidState();
 
     if (oldStr.pImpl->size == 0) {
         return *this;
@@ -215,7 +218,7 @@ String String::replace(const String& oldStr, const String& newStr) const {
     Size start = 0;
     int foundPos = this->find(oldStr);
 
-    while (foundPos != -1) {
+    while (foundPos != NPos) {
         result = result + this->substring(start, foundPos - start);
         result = result + newStr;
         start = foundPos + oldStr.length();
@@ -230,31 +233,25 @@ String String::replace(const String& oldStr, const String& newStr) const {
 }
 
 Boolean String::contains(const String &substring) const {
-    return this->find(substring) != -1;
+    return this->find(substring) != NPos;
 }
 
 Boolean String::startsWith(const String& prefix) const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
+    checkValidState();
 
     if (prefix.pImpl->size > pImpl->size) return false;
     return Memory::compare(pImpl->data.get(), prefix.pImpl->data.get(), prefix.pImpl->size) == 0;
 }
 
 Boolean String::endsWith(const String& suffix) const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
+    checkValidState();
 
     if (suffix.pImpl->size > pImpl->size) return false;
     return Memory::compare(pImpl->data.get() + (pImpl->size - suffix.pImpl->size), suffix.pImpl->data.get(), suffix.pImpl->size) == 0;
 }
 
 List<String> String::split(const String& delimiter) const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
+    checkValidState();
 
     List<String> result;
     Size delimiterLength = delimiter.pImpl->size;
@@ -294,10 +291,8 @@ List<String> String::getLines() const {
     return this->split("\n");
 }
 
-Index String::find(const String& substring, Index startIndex) const {
-    if (!pImpl || !substring.pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
+SSize String::find(const String& substring, SSize startIndex) const {
+    checkValidState();
 
     List<Rune> runes;
     for (Size i = 0; i < pImpl->size; ) {
@@ -316,7 +311,7 @@ Index String::find(const String& substring, Index startIndex) const {
     int thisSize = runes.size();
     int subSize = subRunes.size();
 
-    if (subSize > thisSize) return -1;
+    if (subSize > thisSize) return NPos;
 
     if (startIndex < 0) {
         startIndex = thisSize + startIndex;
@@ -332,7 +327,7 @@ Index String::find(const String& substring, Index startIndex) const {
         }
     } else {
         if (startIndex > thisSize - subSize) {
-            return -1;
+            return NPos;
         }
 
         for (int i = startIndex; i <= thisSize - subSize; ++i) {
@@ -347,12 +342,22 @@ Index String::find(const String& substring, Index startIndex) const {
         }
     }
 
-    return -1;
+    return NPos;
 }
 
 String& String::operator=(const String& other) {
     if (this != &other) {
-        *pImpl = Memory::move(*other.pImpl);
+        Byte* srcData = other.pImpl->data.get();
+        Size srcSize = other.pImpl->size;
+
+        if (srcSize != pImpl->size) {
+            pImpl->data.reset(new Byte[srcSize + 1]);
+            pImpl->size = srcSize;
+        }
+
+        Byte* destData = pImpl->data.get();
+        Memory::copy(destData, srcData, srcSize);
+        destData[srcSize] = '\0';
     }
     return *this;
 }
@@ -367,66 +372,51 @@ String& String::operator=(String&& other) noexcept {
 }
 
 String String::operator+(const String& other) const {
-    if (!pImpl || !(other.pImpl)) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
+    checkValidState();
+    other.checkValidState();
 
-    Size newSize = this->pImpl->size + other.pImpl->size;
+    Size newSize = pImpl->size + other.pImpl->size;
     Byte* newData = static_cast<Byte*>(Memory::allocate(newSize + 1));
-    if (newData) {
-        Memory::copy(newData, this->pImpl->data.get(), this->pImpl->size);
-        Memory::copy(newData + this->pImpl->size, other.pImpl->data.get(), other.pImpl->size);
-        newData[newSize] = '\0';
-    }
+
+    Memory::copy(newData, pImpl->data.get(), pImpl->size);
+    Memory::copy(newData + pImpl->size, other.pImpl->data.get(), other.pImpl->size);
+    newData[newSize] = '\0';
+
     return {reinterpret_cast<CString>(newData), newSize};
 }
 
-String String::operator+=(const String& other) {
-    *this = *this + other;
-    return *this;
-}
+Boolean String::operator==(const String& other) const {
+    checkValidState();
+    other.checkValidState();
 
-bool String::operator==(const String& other) const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
-
-    return this->pImpl->size == other.pImpl->size &&
-           Memory::compare(this->pImpl->data.get(), other.pImpl->data.get(), this->pImpl->size) == 0;
+    return pImpl->size == other.pImpl->size &&
+           Memory::compare(pImpl->data.get(), other.pImpl->data.get(), pImpl->size) == 0;
 }
 
 bool String::operator!=(const String& other) const {
+    this->checkValidState();
+    other.checkValidState();
+
     return !(*this == other);
 }
 
-Container::Array<Byte> String::toBytes() const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
-
-    return {(Byte*) pImpl->data.get(), pImpl->size};
+Array<Byte> String::toBytes() const {
+    checkValidState();
+    return Array<Byte>(pImpl->data.get(), pImpl->size);
 }
 
 CString String::rawString() const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
-
+    checkValidState();
     return reinterpret_cast<CString>(pImpl->data.get());
 }
 
 Size String::rawLength() const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
-
+    checkValidState();
     return pImpl->size;
 }
 
 Array<wchar_t> String::toWCString() const {
-    if (!pImpl) {
-        throw InvalidStateException("Attempt to use a moved-from String object.");
-    }
+    checkValidState();
 
 #ifdef _WIN32
     Size utf16Len = 0;

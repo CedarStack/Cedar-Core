@@ -37,7 +37,7 @@ namespace Cedar::Core::Text {
         static Rune toLowerCase(Rune codepoint);
 
         static Size calculateRuneLength(Byte firstByte);
-        static Rune extractRuneAt(const Byte *data, Index i);
+        static Rune extractRuneAt(const Byte *data, Size i);
         static String encodeRuneToString(Rune codepoint);
     };
 }

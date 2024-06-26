@@ -52,7 +52,7 @@ namespace Cedar::Core::Container {
 
     public:
         HashMap() {
-            for (Index i = 0; i < TableSize; ++i) {
+            for (Size i = 0; i < TableSize; ++i) {
                 buckets[i] = nullptr;
             }
         }
@@ -68,7 +68,7 @@ namespace Cedar::Core::Container {
         }
 
         void insert(const KeyType &key, const ValueType &value) {
-            Index index = myHash(key);
+            Size index = myHash(key);
             HashNode<KeyType, ValueType> *newNode = new HashNode<KeyType, ValueType>(key, value);
             locks[index].lock();
             HashNode<KeyType, ValueType> *node = buckets[index];
@@ -84,7 +84,7 @@ namespace Cedar::Core::Container {
         }
 
         ValueType *find(const KeyType &key) const {
-            Index index = myHash(key);
+            Size index = myHash(key);
             locks[index].lock();
             HashNode<KeyType, ValueType> *node = buckets[index];
             while (node != nullptr) {
@@ -99,7 +99,7 @@ namespace Cedar::Core::Container {
         }
 
         bool remove(const KeyType &key) {
-            Index index = myHash(key);
+            Size index = myHash(key);
             locks[index].lock();
             HashNode<KeyType, ValueType> *node = buckets[index];
             HashNode<KeyType, ValueType> *prev = nullptr;
@@ -122,7 +122,7 @@ namespace Cedar::Core::Container {
         }
 
         void clear() {
-            for (Index i = 0; i < TableSize; ++i) {
+            for (Size i = 0; i < TableSize; ++i) {
                 locks[i].lock();
                 HashNode<KeyType, ValueType> *node = buckets[i];
                 while (node != nullptr) {
@@ -136,7 +136,7 @@ namespace Cedar::Core::Container {
         }
 
         ValueType &operator[](const KeyType &key) {
-            Index index = myHash(key);
+            Size index = myHash(key);
             HashNode<KeyType, ValueType> *node = buckets[index];
 
             while (node != nullptr) {
@@ -156,11 +156,11 @@ namespace Cedar::Core::Container {
         private:
             HashNode<KeyType, ValueType> **buckets;
             HashNode<KeyType, ValueType> *current;
-            Index bucketIndex;
+            Size bucketIndex;
             Size tableSize;
 
         public:
-            Iterator(HashNode<KeyType, ValueType> **buckets, Index index, Size tableSize, Boolean end = false)
+            Iterator(HashNode<KeyType, ValueType> **buckets, Size index, Size tableSize, Boolean end = false)
                     : buckets(buckets), bucketIndex(index), tableSize(tableSize), current(nullptr) {
                 if (!end) {
                     while (bucketIndex < tableSize && !buckets[bucketIndex]) {

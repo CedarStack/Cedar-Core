@@ -30,7 +30,7 @@ using namespace Cedar::Core::Container;
 using namespace Cedar::Core::Text;
 
 Boolean isInRanges(UInt32 codepoint, const Array<UnicodeRange>& ranges) {
-    for (Index i = 0; i < ranges.size(); ++i) {
+    for (Size i = 0; i < ranges.size(); ++i) {
         if (codepoint >= ranges[i].start && codepoint <= ranges[i].end) {
             return true;
         }
@@ -89,7 +89,7 @@ Size Unicode::calculateRuneLength(Byte firstByte) {
     return 0;
 }
 
-Rune Unicode::extractRuneAt(const Byte *data, Index i) {
+Rune Unicode::extractRuneAt(const Byte *data, Size i) {
     const Byte* bytes = &data[i];
     Rune rune = 0;
     Size count = calculateRuneLength(bytes[0]);

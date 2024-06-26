@@ -21,56 +21,20 @@
  * SOFTWARE.
  */
 
-#pragma once
+#include <gtest/gtest.h>
+#include <Cedar/Core/Exceptions/OutOfRangeException.h>
+#include <Cedar/Core/Container/Array.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
+namespace Cedar::Core::Container {
+    TEST(ArrayTest, ConstructFromRawPointer) {
+        int rawArray[5] = {1, 2, 3, 4, 5};
+        Cedar::Core::Container::Array<int> arr(rawArray, 5);
 
-namespace Cedar::Core {
-    using Int8 = signed char;
-    using Int16 = short;
-    using Int32 = int;
-    using Int64 = long long;
+        EXPECT_EQ(arr.size(), 5);
+        for (int i = 0; i < 5; ++i) {
+            EXPECT_EQ(arr[i], rawArray[i]);
+        }
 
-    using UInt8 = unsigned char;
-    using UInt16 = unsigned short;
-    using UInt32 = unsigned int;
-    using UInt64 = unsigned long long;
-
-    using Float32 = float;
-    using Float64 = double;
-
-    using Boolean = bool;
-
-    using Byte = unsigned char;
-    using Rune = char32_t;
-    using UChar = Rune;
-
-    using CChar = char;
-    using CString = const CChar*;
-    using Pointer = void*;
-
-
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = long long;
-    using USizeType = unsigned long long;
-#else
-    using SizeType = int;
-    using USizeType = unsigned int;
-#endif
-
-    using SSize = SizeType;
-    using Size = USizeType;
-    using Hash = USizeType;
-
-#ifdef _WIN32
-#include <windows.h>
-    using Handler = HANDLE;
-#else
-    using Handler = Int32;
-#endif
-
-    template<typename T>
-    Hash hash(const T& val);
+        EXPECT_THROW({ arr[5]; }, OutOfRangeException);
+    }
 }

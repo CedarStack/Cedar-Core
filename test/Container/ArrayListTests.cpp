@@ -21,56 +21,45 @@
  * SOFTWARE.
  */
 
-#pragma once
+#include <gtest/gtest.h>
+#include <Cedar/Core/Exceptions/OutOfRangeException.h>
+#include <Cedar/Core/Container/ArrayList.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
+namespace Cedar::Core::Container {
+    TEST(ArrayListTest, InsertAtAndRemoveAt) {
+        Cedar::Core::Container::ArrayList<int> list;
+        list.append(1);
+        list.append(3);
 
-namespace Cedar::Core {
-    using Int8 = signed char;
-    using Int16 = short;
-    using Int32 = int;
-    using Int64 = long long;
+        list.insertAt(1, 2);
+        EXPECT_EQ(list.size(), 3);
+        EXPECT_EQ(list[0], 1);
+        EXPECT_EQ(list[1], 2);
+        EXPECT_EQ(list[2], 3);
 
-    using UInt8 = unsigned char;
-    using UInt16 = unsigned short;
-    using UInt32 = unsigned int;
-    using UInt64 = unsigned long long;
+        list.insertAt(3, 4);
+        EXPECT_EQ(list.size(), 4);
+        EXPECT_EQ(list[3], 4);
 
-    using Float32 = float;
-    using Float64 = double;
+        EXPECT_THROW({ list.insertAt(10, 5); }, OutOfRangeException);
 
-    using Boolean = bool;
+        list.removeAt(1);
+        EXPECT_EQ(list.size(), 3);
+        EXPECT_EQ(list[0], 1);
+        EXPECT_EQ(list[1], 3);
+        EXPECT_EQ(list[2], 4);
 
-    using Byte = unsigned char;
-    using Rune = char32_t;
-    using UChar = Rune;
+        list.removeAt(2);
+        EXPECT_EQ(list.size(), 2);
+        EXPECT_EQ(list[1], 3);
 
-    using CChar = char;
-    using CString = const CChar*;
-    using Pointer = void*;
+        EXPECT_THROW({ list.removeAt(5); }, OutOfRangeException);
+    }
 
+    TEST(ArrayListTest, AccessOutOfBounds) {
+        Cedar::Core::Container::ArrayList<int> list;
+        list.append(1);
 
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = long long;
-    using USizeType = unsigned long long;
-#else
-    using SizeType = int;
-    using USizeType = unsigned int;
-#endif
-
-    using SSize = SizeType;
-    using Size = USizeType;
-    using Hash = USizeType;
-
-#ifdef _WIN32
-#include <windows.h>
-    using Handler = HANDLE;
-#else
-    using Handler = Int32;
-#endif
-
-    template<typename T>
-    Hash hash(const T& val);
+        EXPECT_THROW({ list[1]; }, OutOfRangeException);
+    }
 }

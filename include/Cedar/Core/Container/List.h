@@ -117,9 +117,9 @@ namespace Cedar::Core::Container {
             return currentSize;
         }
 
-        ListNode<T>* getNodeAt(Index index) const {
+        ListNode<T>* getNodeAt(Size index) const {
             ListNode<T>* current = m_head;
-            Index currentIndex = 0;
+            Size currentIndex = 0;
             while (current != nullptr && currentIndex < index) {
                 current = current->next;
                 currentIndex++;
@@ -127,7 +127,7 @@ namespace Cedar::Core::Container {
             return current;
         }
 
-        T& operator[](Index index) {
+        T& operator[](Size index) {
             m_mtx.lock();
             ListNode<T>* node = getNodeAt(index);
             if (node == nullptr) {
@@ -139,7 +139,7 @@ namespace Cedar::Core::Container {
             return value;
         }
 
-        const T& operator[](Index index) const {
+        const T& operator[](Size index) const {
             m_mtx.lock();
             ListNode<T>* node = getNodeAt(index);
             if (node == nullptr) {

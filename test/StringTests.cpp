@@ -32,7 +32,7 @@ namespace Cedar::Core {
     TEST(StringTest, DefaultConstructor) {
         String str;
         EXPECT_EQ(str.length(), 0);
-        EXPECT_TRUE(str.rawString() == nullptr);
+        EXPECT_STREQ(str.rawString(), "");
     }
 
     // Tests the constructor that initializes with a C-style string.
@@ -55,9 +55,9 @@ namespace Cedar::Core {
         String moved(std::move(original));
 
         EXPECT_EQ(moved.length(), 4);
-        EXPECT_TRUE(original.rawString() == nullptr);
 
         // Verify InvalidStateException is thrown when using the moved-from object.
+        EXPECT_THROW(original.rawString(), InvalidStateException);
         EXPECT_THROW(original.length(), InvalidStateException);
     }
 

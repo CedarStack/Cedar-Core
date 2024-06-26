@@ -32,7 +32,7 @@ const String pathSeparator = "/";
 static String normalize(const String& path) {
     String normalizedPath = path.replace("\\", "/");
 
-    Index pos = 0;
+    Size pos = 0;
     while ((pos = normalizedPath.find("//", pos + 2)) != String::NPos) {
         normalizedPath = normalizedPath.substring(0, pos) + normalizedPath.substring(pos + 1);
     }
@@ -61,23 +61,23 @@ Path::~Path() {
 }
 
 String Path::getFileName() const {
-    Index pos = pImpl->path.find("/", -1);
+    Size pos = pImpl->path.find("/", -1);
     return pos != String::NPos ? pImpl->path.substring(pos + 1) : pImpl->path;
 }
 
 String Path::getFileType() const {
-    Index pos = pImpl->path.find('.', -1);
+    Size pos = pImpl->path.find('.', -1);
     return pos != String::NPos ? pImpl->path.substring(pos) : String();
 }
 
 Path Path::getParent() const {
-    Index pos = pImpl->path.find(pathSeparator, -1);
+    Size pos = pImpl->path.find(pathSeparator, -1);
     return pos != String::NPos ? Path(pImpl->path.substring(0, pos)) : Path();
 }
 
 String Path::getRoot() const {
     if (isAbsolute()) {
-        Index pos = pImpl->path.find(pathSeparator);
+        Size pos = pImpl->path.find(pathSeparator);
         if (pos != String::NPos) {
             return pImpl->path.substring(0, pos);
         }
@@ -91,7 +91,7 @@ Boolean Path::isAbsolute() const {
 
 Size Path::calculateDepth() const {
     Size depth = 0;
-    Index start = 0;
+    Size start = 0;
     while ((start = pImpl->path.find(pathSeparator, start + 1)) != String::NPos) {
         depth++;
     }
@@ -100,7 +100,7 @@ Size Path::calculateDepth() const {
 
 List<Path> Path::decomposeList() const {
     List<Path> parts;
-    Index start = 0, end;
+    Size start = 0, end;
 
     while ((end = pImpl->path.find(pathSeparator, start)) != String::NPos) {
         if (end != start) {
