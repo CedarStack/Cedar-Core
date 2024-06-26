@@ -24,12 +24,12 @@ Serialization: Supports data serialization and deserialization, including but no
 Development of Cedar-Core is proceeding according to the following plan:
 
 - [X] Initialize project structure
-- [] Complete the basic math library
+- [ ] Complete the basic math library
 - [x] Implement efficient string processing modules
-- [] Develop file and network I/O functionalities
-- [] Enhance network communication support
-- [] Implement multi-threading features
-- [] Develop data serialization modules
+- [ ] Develop file and network I/O functionalities
+- [ ] Enhance network communication support
+- [ ] Implement multi-threading features
+- [ ] Develop data serialization modules
 
 ## 💻 Prerequisites
 Before you begin using or contributing to Cedar-Core, please ensure your system meets the following requirements:
