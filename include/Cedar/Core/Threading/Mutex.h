@@ -33,7 +33,7 @@ namespace Cedar::Core::Threading {
         void unlock() const;
 
     private:
-        class Impl;
+        struct Impl;
         Impl* pImpl;
     };
 }

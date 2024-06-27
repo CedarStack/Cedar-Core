@@ -24,6 +24,7 @@
 #pragma once
 
 #include <Cedar/Core/BasicTypes.h>
+#include <Cedar/Core/TypeTraits.h>
 #include <Cedar/Core/Exceptions/OutOfMemoryException.h>
 
 namespace Cedar::Core::Memory {
@@ -38,36 +39,6 @@ namespace Cedar::Core::Memory {
     Pointer allocate(Size size);
 
     void release(Pointer pointer);
-
-    template<typename T>
-    struct RemoveReference {
-        typedef T type;
-    };
-
-    template<typename T>
-    struct RemoveReference<T &> {
-        typedef T type;
-    };
-
-    template<typename T>
-    struct RemoveReference<T &&> {
-        typedef T type;
-    };
-
-    template<typename T>
-    typename RemoveReference<T>::type &&move(T &&arg) {
-        return static_cast<typename Memory::RemoveReference<T>::type &&>(arg);
-    }
-
-    template<typename T>
-    T&& forward(typename RemoveReference<T>::type& arg) noexcept {
-        return static_cast<T&&>(arg);
-    }
-
-    template<typename T>
-    T&& forward(typename RemoveReference<T>::type&& arg) noexcept {
-        return static_cast<T&&>(arg);
-    }
 
     template<typename T>
     class Allocator {
@@ -89,7 +60,7 @@ namespace Cedar::Core::Memory {
 
         template<typename... Args>
         void construct(T* ptr, Args&&... args) {
-            new (ptr) T(forward<Args>(args)...);
+            new (ptr) T(TypeTraits::forward<Args>(args)...);
         }
 
         void destroy(T* ptr) {
@@ -160,7 +131,7 @@ namespace Cedar::Core::Memory {
             delete[] m_pointer;
         }
 
-        T& operator[](std::size_t idx) const { return m_pointer[idx]; }
+        T& operator[](Size idx) const { return m_pointer[idx]; }
         T* get() const { return m_pointer; }
         T* release() {
             T* tmp = m_pointer;
@@ -177,14 +148,32 @@ namespace Cedar::Core::Memory {
         T* m_pointer;
     };
 
-
     template<typename T>
     class SharedPointer {
     public:
-        explicit SharedPointer(T* p = nullptr) : m_pointer(p), m_count(new unsigned(1)) {}
+        explicit SharedPointer(T* p = nullptr)
+                : m_pointer(p), m_count(p ? new unsigned(1) : nullptr) {}
 
-        SharedPointer(const SharedPointer& sp) : m_pointer(sp.m_pointer), m_count(sp.m_count) {
-            (*m_count)++;
+        SharedPointer(const SharedPointer& sp)
+                : m_pointer(sp.m_pointer), m_count(sp.m_count) {
+            if (m_count) {
+                ++(*m_count);
+            }
+        }
+
+        template<typename U>
+        SharedPointer(const SharedPointer<U>& sp)
+                : m_pointer(sp.m_pointer), m_count(sp.m_count) {
+            if (m_count) {
+                ++(*m_count);
+            }
+        }
+
+        SharedPointer(T* p, unsigned* count)
+                : m_pointer(p), m_count(count) {
+            if (m_count) {
+                ++(*m_count);
+            }
         }
 
         ~SharedPointer() {
@@ -196,33 +185,41 @@ namespace Cedar::Core::Memory {
                 release();
                 m_pointer = sp.m_pointer;
                 m_count = sp.m_count;
-                (*m_count)++;
+                if (m_count) {
+                    ++(*m_count);
+                }
             }
             return *this;
         }
 
         T* get() const { return m_pointer; }
-
         T& operator*() const { return *m_pointer; }
-
         T* operator->() const { return m_pointer; }
-
-        unsigned useCount() const { return *m_count; }
+        unsigned useCount() const { return m_count ? *m_count : 0; }
 
         void reset(T* p = nullptr) {
             release();
             m_pointer = p;
-            m_count = new unsigned(1);
+            m_count = p ? new unsigned(1) : nullptr;
         }
+
     private:
+        template<typename U> friend class SharedPointer;
         T* m_pointer;
         unsigned* m_count;
 
         void release() {
-            if (m_count && --(m_count) == 0) {
+            if (m_count && --(*m_count) == 0) {
                 delete m_pointer;
                 delete m_count;
             }
         }
     };
+
+    template<typename T, typename... Args>
+    SharedPointer<T> makeShared(Args&&... args) {
+        T* ptr = new T(std::forward<Args>(args)...);
+        return SharedPointer<T>(ptr, new unsigned(1));
+    }
+
 }

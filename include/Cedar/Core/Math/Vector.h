@@ -125,7 +125,7 @@ namespace Cedar::Core::Math {
             return *this;
         }
 
-        bool operator==(const Vector &v) const {
+        Boolean operator==(const Vector &v) const {
             for (Size i = 0; i < S; ++i) {
                 if (m_array[i] != v.m_array[i]) {
                     return false;
@@ -134,7 +134,7 @@ namespace Cedar::Core::Math {
             return true;
         }
 
-        bool operator!=(const Vector &v) const {
+        Boolean operator!=(const Vector &v) const {
             // NOLINTNEXTLINE
             return !(*this == v);
         }

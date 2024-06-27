@@ -21,33 +21,14 @@
  * SOFTWARE.
  */
 
-#include <Cedar/Core/Memory.h>
+#pragma once
 
-// NOLINTNEXTLINE
-#include <string.h>
+#include <Cedar/Core/Exceptions/Exception.h>
 
-using namespace Cedar::Core;
-
-void Memory::copy(Cedar::Core::Pointer target, Cedar::Core::Pointer source, Cedar::Core::Size size) {
-    memcpy(target, source, size);
-}
-
-Int32 Memory::compare(Pointer p1, Pointer p2, Size size) {
-    return memcmp(p1, p2, size);
-}
-
-void Memory::copyCString(Cedar::Core::CString target, Cedar::Core::CString source) {
-    strcpy((CChar*) target, source);
-}
-
-Size Memory::calcCStringLength(Cedar::Core::CString string) {
-    return strlen(string);
-}
-
-Pointer Memory::allocate(Size size) {
-    return new Byte[size]();
-}
-
-void Memory::release(Pointer memory) {
-    delete[] static_cast<Byte*>(memory);
+namespace Cedar::Core {
+    class RuntimeException: public Exception {
+    public:
+        explicit RuntimeException(const String& message): Exception(message) {}
+        explicit RuntimeException(CString message): Exception(message) {}
+    };
 }

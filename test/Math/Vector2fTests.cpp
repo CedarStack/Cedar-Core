@@ -114,12 +114,12 @@ namespace Cedar::Core::Math {
     TEST(VectorTest, EqualOp) {
         Vec2f v2f_0(-2.4f, 6.7f);
         Vec2f v2f_1(-12.73f, -7.31f);
-        bool temp = v2f_0 == v2f_1;
+        Boolean temp = v2f_0 == v2f_1;
         EXPECT_FALSE(temp);
 
         Vec2f v2f_2(-2.4f, 6.7f);
         Vec2f v2f_3(-2.4f, 6.7f);
-        bool temp_1 = v2f_2 == v2f_3;
+        Boolean temp_1 = v2f_2 == v2f_3;
         EXPECT_TRUE(temp_1);
     }
 
@@ -127,12 +127,12 @@ namespace Cedar::Core::Math {
     TEST(VectorTest, InverseEqualOp) {
         Vec2f v2f_0(-2.4f, 6.7f);
         Vec2f v2f_1(-12.73f, -7.31f);
-        bool temp = v2f_0 != v2f_1;
+        Boolean temp = v2f_0 != v2f_1;
         EXPECT_TRUE(temp);
 
         Vec2f v2f_2(-2.4f, 6.7f);
         Vec2f v2f_3(-2.4f, 6.7f);
-        bool temp_1 = v2f_2 != v2f_3;
+        Boolean temp_1 = v2f_2 != v2f_3;
         EXPECT_FALSE(temp_1);
     }
 

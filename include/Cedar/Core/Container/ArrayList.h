@@ -44,7 +44,7 @@ namespace Cedar::Core::Container {
         void resizeInternal(Size newCapacity) {
             T *newData = m_allocator.allocate(newCapacity);
             for (Size i = 0; i < m_size; ++i) {
-                m_allocator.construct(newData + i, Memory::move(m_data[i]));
+                m_allocator.construct(newData + i, TypeTraits::move(m_data[i]));
                 m_allocator.destroy(m_data.get() + i);
             }
             m_allocator.deallocate(m_data.release());
@@ -100,7 +100,7 @@ namespace Cedar::Core::Container {
             m_allocator.construct(m_data.get() + m_size++, value);
         }
 
-        bool remove(const T &value) {
+        Boolean remove(const T &value) {
             Threading::LockGuard<Threading::Mutex> lock(m_mtx);
             for (Size i = 0; i < m_size; i++) {
                 if (m_data[i] == value) {
@@ -120,7 +120,7 @@ namespace Cedar::Core::Container {
                 resizeInternal(m_capacity == 0 ? 1 : m_capacity * 2);
             }
             for (Size i = m_size; i > index; --i) {
-                m_allocator.construct(m_data.get() + i, Memory::move(m_data[i - 1]));
+                m_allocator.construct(m_data.get() + i, TypeTraits::move(m_data[i - 1]));
                 m_allocator.destroy(m_data.get() + i - 1);
             }
             m_allocator.construct(m_data.get() + index, value);
@@ -134,7 +134,7 @@ namespace Cedar::Core::Container {
             Threading::LockGuard<Threading::Mutex> lock(m_mtx);
             m_allocator.destroy(m_data.get() + index);
             for (Size i = index; i < m_size - 1; ++i) {
-                m_allocator.construct(m_data.get() + i, Memory::move(m_data[i + 1]));
+                m_allocator.construct(m_data.get() + i, TypeTraits::move(m_data[i + 1]));
                 m_allocator.destroy(m_data.get() + i + 1);
             }
             --m_size;
@@ -187,7 +187,7 @@ namespace Cedar::Core::Container {
                 return *this;
             }
 
-            Iterator operator++(int) {
+            Iterator operator++(Int32) {
                 Iterator tmp = *this;
                 ++m_ptr;
                 return tmp;
@@ -201,11 +201,11 @@ namespace Cedar::Core::Container {
                 return m_ptr;
             }
 
-            bool operator==(const Iterator &other) const {
+            Boolean operator==(const Iterator &other) const {
                 return m_ptr == other.m_ptr;
             }
 
-            bool operator!=(const Iterator &other) const {
+            Boolean operator!=(const Iterator &other) const {
                 return m_ptr != other.m_ptr;
             }
         };
@@ -231,7 +231,7 @@ namespace Cedar::Core::Container {
                 return *this;
             }
 
-            ConstIterator operator++(int) {
+            ConstIterator operator++(Int32) {
                 ConstIterator tmp = *this;
                 ++m_ptr;
                 return tmp;
@@ -245,11 +245,11 @@ namespace Cedar::Core::Container {
                 return m_ptr;
             }
 
-            bool operator==(const ConstIterator &other) const {
+            Boolean operator==(const ConstIterator &other) const {
                 return m_ptr == other.m_ptr;
             }
 
-            bool operator!=(const ConstIterator &other) const {
+            Boolean operator!=(const ConstIterator &other) const {
                 return m_ptr != other.m_ptr;
             }
         };

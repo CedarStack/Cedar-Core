@@ -21,33 +21,32 @@
  * SOFTWARE.
  */
 
-#include <Cedar/Core/Memory.h>
+#include <gtest/gtest.h>
+#include <Cedar/Core/Function.h>
 
-// NOLINTNEXTLINE
-#include <string.h>
+namespace Cedar::Core {
+    void testFunction() {
+        std::cout << "Function executed." << std::endl;
+    }
 
-using namespace Cedar::Core;
+    TEST(FunctionTest, FunctionExecution) {
+        Boolean called = false;
+        Function<void> func = [&called]() { called = true; };
 
-void Memory::copy(Cedar::Core::Pointer target, Cedar::Core::Pointer source, Cedar::Core::Size size) {
-    memcpy(target, source, size);
-}
+        EXPECT_FALSE(called);
+        func();
+        EXPECT_TRUE(called);
+    }
 
-Int32 Memory::compare(Pointer p1, Pointer p2, Size size) {
-    return memcmp(p1, p2, size);
-}
+    TEST(FunctionTest, FunctionPointerExecution) {
+        Boolean called = false;
+        Function<void> func(testFunction);
 
-void Memory::copyCString(Cedar::Core::CString target, Cedar::Core::CString source) {
-    strcpy((CChar*) target, source);
-}
+        // Redirect cout to test output
+        testing::internal::CaptureStdout();
+        func();
+        std::string output = testing::internal::GetCapturedStdout();
 
-Size Memory::calcCStringLength(Cedar::Core::CString string) {
-    return strlen(string);
-}
-
-Pointer Memory::allocate(Size size) {
-    return new Byte[size]();
-}
-
-void Memory::release(Pointer memory) {
-    delete[] static_cast<Byte*>(memory);
+        EXPECT_EQ(output, "Function executed.\n");
+    }
 }

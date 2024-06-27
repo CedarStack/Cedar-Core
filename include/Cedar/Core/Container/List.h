@@ -67,7 +67,7 @@ namespace Cedar::Core::Container {
             m_mtx.unlock();
         }
 
-        bool remove(T value) {
+        Boolean remove(T value) {
             m_mtx.lock();
             ListNode<T>* current = m_head;
             ListNode<T>* prev = nullptr;
@@ -164,7 +164,7 @@ namespace Cedar::Core::Container {
                 return *this;
             }
 
-            bool operator!=(const Iterator& other) const {
+            Boolean operator!=(const Iterator& other) const {
                 return m_current != other.m_current;
             }
 
