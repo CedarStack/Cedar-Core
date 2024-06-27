@@ -23,54 +23,26 @@
 
 #pragma once
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include <exception>
+#include "Cedar/Core/BasicTypes.h"
 
 namespace Cedar::Core {
-    using Int8 = signed char;
-    using Int16 = short;
-    using Int32 = int;
-    using Int64 = long long;
+    class String;
 
-    using UInt8 = unsigned char;
-    using UInt16 = unsigned short;
-    using UInt32 = unsigned int;
-    using UInt64 = unsigned long long;
+    class Exception : public std::exception {
+    public:
+        explicit Exception(const String &message);
+        explicit Exception(CString message);
 
-    using Float32 = float;
-    using Float64 = double;
+        ~Exception();
 
-    using Boolean = bool;
+        String getMessage() const noexcept;
 
-    using Byte = unsigned char;
-    using Rune = char32_t;
-    using UChar = Rune;
+        const char *what() const noexcept override;
 
-    using CChar = char;
-    using CString = const CChar*;
-    using Pointer = void*;
+    private:
+        class Impl;
 
-
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = long long;
-    using USizeType = unsigned long long;
-#else
-    using SizeType = int;
-    using USizeType = unsigned int;
-#endif
-
-    using SSize = SizeType;
-    using Size = USizeType;
-    using Hash = USizeType;
-
-#ifdef _WIN32
-#include <windows.h>
-    using Handler = HANDLE;
-#else
-    using Handler = Int32;
-#endif
-
-    template<typename T>
-    Hash hash(const T& val);
+        Impl *pImpl;
+    };
 }

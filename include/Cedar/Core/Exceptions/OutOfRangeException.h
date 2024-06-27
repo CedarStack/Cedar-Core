@@ -23,24 +23,12 @@
 
 #pragma once
 
-#include <exception>
+#include <Cedar/Core/Exceptions/Exception.h>
 
 namespace Cedar::Core {
-    class String;
-
-    class Exception : public std::exception {
+    class OutOfRangeException: public Exception {
     public:
-        explicit Exception(const String &message);
-
-        ~Exception();
-
-        String getMessage() const noexcept;
-
-        const char *what() const noexcept override;
-
-    private:
-        class Impl;
-
-        Impl *pImpl;
+        explicit OutOfRangeException(const String& message): Exception(message) {}
+        explicit OutOfRangeException(CString message): Exception(message) {}
     };
 }

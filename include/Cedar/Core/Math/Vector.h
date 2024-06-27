@@ -33,7 +33,7 @@ namespace Cedar::Core::Math {
         Vector() = default;
 
         explicit Vector(T value) {
-            for (Index i = 0; i < S; ++i) {
+            for (Size i = 0; i < S; ++i) {
                 m_array[i] = value;
             }
         }
@@ -42,19 +42,19 @@ namespace Cedar::Core::Math {
         explicit Vector(T1... values) {
             static_assert(sizeof...(values) == S, "Number of arguments must match the vector size");
             T initList[] = { values... };
-            for (Index i = 0; i < S; ++i) {
+            for (Size i = 0; i < S; ++i) {
                 m_array[i] = initList[i];
             }
         }
 
-        T operator[](Index index) const {
+        T operator[](Size index) const {
             if (index >= S) {
                 throw OutOfRangeException("Index out of range");
             }
             return m_array[index];
         }
 
-        T& operator[](Index index) {
+        T& operator[](Size index) {
             if (index >= S) {
                 throw OutOfRangeException("Index out of range");
             }
@@ -62,16 +62,12 @@ namespace Cedar::Core::Math {
         }
 
         Vector operator+() const {
-            Vector result = *this;
-            for (Index i = 0; i < S; ++i) {
-                result.m_array[i] = std::abs(m_array[i]);
-            }
-            return result;
+            return *this;
         }
 
         Vector operator-() const {
             Vector result;
-            for (Index i = 0; i < S; ++i) {
+            for (Size i = 0; i < S; ++i) {
                 result.m_array[i] = -m_array[i];
             }
             return result;
@@ -79,7 +75,7 @@ namespace Cedar::Core::Math {
 
         Vector operator+(const Vector &v) const {
             Vector result = *this;
-            for (Index i = 0; i < S; ++i) {
+            for (Size i = 0; i < S; ++i) {
                 result.m_array[i] += v.m_array[i];
             }
             return result;
@@ -87,7 +83,7 @@ namespace Cedar::Core::Math {
 
         Vector operator-(const Vector &v) const {
             Vector result = *this;
-            for (Index i = 0; i < S; ++i) {
+            for (Size i = 0; i < S; ++i) {
                 result.m_array[i] -= v.m_array[i];
             }
             return result;
@@ -95,7 +91,7 @@ namespace Cedar::Core::Math {
 
         Vector operator*(const Vector &v) const {
             Vector result = *this;
-            for (Index i = 0; i < S; ++i) {
+            for (Size i = 0; i < S; ++i) {
                 result.m_array[i] *= v.m_array[i];
             }
             return result;
@@ -103,7 +99,7 @@ namespace Cedar::Core::Math {
 
         Vector operator/(const Vector &v) const {
             Vector result = *this;
-            for (Index i = 0; i < S; ++i) {
+            for (Size i = 0; i < S; ++i) {
                 result.m_array[i] /= v.m_array[i];
             }
             return result;
@@ -130,7 +126,7 @@ namespace Cedar::Core::Math {
         }
 
         bool operator==(const Vector &v) const {
-            for (Index i = 0; i < S; ++i) {
+            for (Size i = 0; i < S; ++i) {
                 if (m_array[i] != v.m_array[i]) {
                     return false;
                 }
@@ -145,7 +141,7 @@ namespace Cedar::Core::Math {
 
         T length() const {
             T sum = 0;
-            for (Index i = 0; i < S; ++i) {
+            for (Size i = 0; i < S; ++i) {
                 sum += m_array[i] * m_array[i];
             }
             return Math::sqrt(sum);

@@ -23,54 +23,36 @@
 
 #pragma once
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include <Cedar/Core/String.h>
+#include <Cedar/Core/Container/List.h>
 
-namespace Cedar::Core {
-    using Int8 = signed char;
-    using Int16 = short;
-    using Int32 = int;
-    using Int64 = long long;
+namespace Cedar::Core::IO {
+    class Path {
+    public:
+        Path();
+        Path(const String& path);
+        Path(const Path& other);
+        Path(Path&& other) noexcept;
+        ~Path();
 
-    using UInt8 = unsigned char;
-    using UInt16 = unsigned short;
-    using UInt32 = unsigned int;
-    using UInt64 = unsigned long long;
+        // Basic operations
+        [[nodiscard]] String getFileName() const;
+        [[nodiscard]] String getFileType() const;
+        [[nodiscard]] Path getParent() const;
+        [[nodiscard]] String getRoot() const;
+        [[nodiscard]] Boolean isAbsolute() const;
+        [[nodiscard]] Size calculateDepth() const;
+        [[nodiscard]] Container::List<Path> decomposeList() const;
 
-    using Float32 = float;
-    using Float64 = double;
+        // Operator overloads
+        Path& operator=(const Path& other);
+        Path& operator=(Path&& other) noexcept;
+        [[nodiscard]] Path operator[](Size index) const;
 
-    using Boolean = bool;
-
-    using Byte = unsigned char;
-    using Rune = char32_t;
-    using UChar = Rune;
-
-    using CChar = char;
-    using CString = const CChar*;
-    using Pointer = void*;
-
-
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = long long;
-    using USizeType = unsigned long long;
-#else
-    using SizeType = int;
-    using USizeType = unsigned int;
-#endif
-
-    using SSize = SizeType;
-    using Size = USizeType;
-    using Hash = USizeType;
-
-#ifdef _WIN32
-#include <windows.h>
-    using Handler = HANDLE;
-#else
-    using Handler = Int32;
-#endif
-
-    template<typename T>
-    Hash hash(const T& val);
+        // Conversion to string for easy output
+        [[nodiscard]] String toString() const;
+    private:
+        struct Impl;
+        Impl* pImpl;
+    };
 }

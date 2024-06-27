@@ -23,54 +23,13 @@
 
 #pragma once
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include <Cedar/Core/Exceptions/Exception.h>
 
 namespace Cedar::Core {
-    using Int8 = signed char;
-    using Int16 = short;
-    using Int32 = int;
-    using Int64 = long long;
+    class InvalidStateException: public Exception {
+    public:
+        explicit InvalidStateException(const String& message): Exception(message) {}
+        explicit InvalidStateException(CString message): Exception(message) {}
 
-    using UInt8 = unsigned char;
-    using UInt16 = unsigned short;
-    using UInt32 = unsigned int;
-    using UInt64 = unsigned long long;
-
-    using Float32 = float;
-    using Float64 = double;
-
-    using Boolean = bool;
-
-    using Byte = unsigned char;
-    using Rune = char32_t;
-    using UChar = Rune;
-
-    using CChar = char;
-    using CString = const CChar*;
-    using Pointer = void*;
-
-
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = long long;
-    using USizeType = unsigned long long;
-#else
-    using SizeType = int;
-    using USizeType = unsigned int;
-#endif
-
-    using SSize = SizeType;
-    using Size = USizeType;
-    using Hash = USizeType;
-
-#ifdef _WIN32
-#include <windows.h>
-    using Handler = HANDLE;
-#else
-    using Handler = Int32;
-#endif
-
-    template<typename T>
-    Hash hash(const T& val);
+    };
 }

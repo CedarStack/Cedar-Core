@@ -29,6 +29,9 @@ namespace Cedar::Core {
     namespace Container {
         template<typename T>
         class List;
+
+        template<typename T>
+        class Array;
     }
 
     class String {
@@ -38,23 +41,69 @@ namespace Cedar::Core {
         //NOLINTNEXTLINE
         String(CString string);
         String(CString str, Size len);
+        String(const Container::Array<Byte>& byteArray);
         String(const String& other);
         String(String&& other) noexcept;
+        String(Rune rune);
+
         ~String();
 
-        Rune at(Index index) const;
-        CString rawString() const noexcept;
+        [[nodiscard]] Size length() const;
 
-        Container::List<String> split(const String& delimiter) const;
+        [[nodiscard]] Rune at(SSize index) const;
+        [[nodiscard]] Rune operator[](SSize index) const;
 
-        Rune operator[](Index index) const;
+        [[nodiscard]] String trim() const;
+        [[nodiscard]] String trimStart() const;
+        [[nodiscard]] String trimEnd() const;
+        [[nodiscard]] String stripPrefix(const String& prefix) const;
+        [[nodiscard]] String stripSuffix(const String& suffix) const;
+        [[nodiscard]] String substring(Size start, Size len = NPos) const;
+        [[nodiscard]] String replace(const String& oldStr, const String& newStr) const;
+
+        [[nodiscard]] Boolean contains(const String& substring) const;
+        [[nodiscard]] Boolean startsWith(const String& prefix) const;
+        [[nodiscard]] Boolean endsWith(const String& suffix) const;
+
+        [[nodiscard]] Container::List<String> split(const String& delimiter) const;
+        [[nodiscard]] Container::List<String> getLines() const;
+        [[nodiscard]] SSize find(const String& substring, SSize startIndex = 0) const;
+
         String& operator=(const String& other);
         String& operator=(String&& other) noexcept;
         String operator+(const String& other) const;
         Boolean operator==(const String& other) const;
         Boolean operator!=(const String& other) const;
+
+        [[nodiscard]] Container::Array<Byte> toBytes() const;
+
+        [[nodiscard]] CString rawString() const;
+        [[nodiscard]] Size rawLength() const;
+
+        [[nodiscard]] Container::Array<wchar_t> toWCString() const;
+
+        static const SSize NPos = -1;
+
+// TODO
+//        class Iterator {
+//        public:
+//            Iterator(const Byte* ptr, const Byte* end);
+//            Iterator& operator++();
+//            Iterator operator++(int);
+//            Rune operator*() const ;
+//            bool operator!=(const Iterator& other) const;
+//            bool operator==(const Iterator& other) const;
+//        private:
+//            const Byte* ptr;
+//            const Byte* end;
+//        };
+//        Iterator begin() const;
+//        Iterator end() const;
+
     private:
         struct Impl;
         Impl* pImpl;
+
+        void checkValidState() const;
     };
-}  // namespace Cedar::Core
+}

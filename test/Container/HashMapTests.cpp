@@ -21,13 +21,43 @@
  * SOFTWARE.
  */
 
-#pragma once
+#include <gtest/gtest.h>
+#include <Cedar/Core/Container/HashMap.h>
 
-#include <Cedar/Core/Exception.h>
+namespace Cedar::Core::Container {
+    TEST(HashMapTest, InsertAndFind) {
+        HashMap<int, std::string, 10> map;
 
-namespace Cedar::Core {
-    class OutOfRangeException: public Exception {
-    public:
-        explicit OutOfRangeException(const String& message): Exception(message) {}
-    };
+        map.insert(1, "one");
+        map.insert(2, "two");
+        map.insert(3, "three");
+
+        EXPECT_EQ(*map.find(1), "one");
+        EXPECT_EQ(*map.find(2), "two");
+        EXPECT_EQ(*map.find(3), "three");
+        EXPECT_EQ(map.find(4), nullptr);
+    }
+
+    TEST(HashMapTest, Delete) {
+        HashMap<int, std::string, 10> map;
+
+        map.insert(1, "one");
+        map.insert(2, "two");
+
+        EXPECT_TRUE(map.remove(1));
+        EXPECT_EQ(map.find(1), nullptr);
+        EXPECT_NE(map.find(2), nullptr);
+        EXPECT_FALSE(map.remove(1));
+    }
+
+    TEST(HashMapTest, Clear) {
+        HashMap<int, std::string, 10> map;
+
+        map.insert(1, "one");
+        map.insert(2, "two");
+        map.clear();
+
+        EXPECT_EQ(map.find(1), nullptr);
+        EXPECT_EQ(map.find(2), nullptr);
+    }
 }

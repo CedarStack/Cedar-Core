@@ -23,54 +23,36 @@
 
 #pragma once
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include <Cedar/Core/Memory.h>
 
-namespace Cedar::Core {
-    using Int8 = signed char;
-    using Int16 = short;
-    using Int32 = int;
-    using Int64 = long long;
+namespace Cedar::Core::Container {
 
-    using UInt8 = unsigned char;
-    using UInt16 = unsigned short;
-    using UInt32 = unsigned int;
-    using UInt64 = unsigned long long;
+    template<typename T1, typename T2>
+    class Pair {
+    public:
+        T1 first;
+        T2 second;
 
-    using Float32 = float;
-    using Float64 = double;
+        Pair() : first(T1()), second(T2()) {}
 
-    using Boolean = bool;
+        Pair(const T1& x, const T2& y) : first(x), second(y) {}
+        Pair(const Pair& other) : first(other.first), second(other.second) {}
+        Pair(Pair&& other) noexcept : first(Memory::move(other.first)), second(Memory::move(other.second)) {}
 
-    using Byte = unsigned char;
-    using Rune = char32_t;
-    using UChar = Rune;
+        Pair& operator=(const Pair& other) {
+            if (this != &other) {
+                first = other.first;
+                second = other.second;
+            }
+            return *this;
+        }
 
-    using CChar = char;
-    using CString = const CChar*;
-    using Pointer = void*;
-
-
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = long long;
-    using USizeType = unsigned long long;
-#else
-    using SizeType = int;
-    using USizeType = unsigned int;
-#endif
-
-    using SSize = SizeType;
-    using Size = USizeType;
-    using Hash = USizeType;
-
-#ifdef _WIN32
-#include <windows.h>
-    using Handler = HANDLE;
-#else
-    using Handler = Int32;
-#endif
-
-    template<typename T>
-    Hash hash(const T& val);
+        Pair& operator=(Pair&& other) noexcept {
+            if (this != &other) {
+                first = Memory::move(other.first);
+                second = Memory::move(other.second);
+            }
+            return *this;
+        }
+    };
 }

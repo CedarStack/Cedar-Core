@@ -23,54 +23,21 @@
 
 #pragma once
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include <Cedar/Core/BasicTypes.h>
+#include <Cedar/Core/String.h>
 
-namespace Cedar::Core {
-    using Int8 = signed char;
-    using Int16 = short;
-    using Int32 = int;
-    using Int64 = long long;
+namespace Cedar::Core::Text {
+    class Unicode {
+    public:
+        static Boolean isLetter(Rune codepoint);
+        static Boolean isDigit(Rune codepoint);
+        static Boolean isSpace(Rune codepoint);
 
-    using UInt8 = unsigned char;
-    using UInt16 = unsigned short;
-    using UInt32 = unsigned int;
-    using UInt64 = unsigned long long;
+        static Rune toUpperCase(Rune codepoint);
+        static Rune toLowerCase(Rune codepoint);
 
-    using Float32 = float;
-    using Float64 = double;
-
-    using Boolean = bool;
-
-    using Byte = unsigned char;
-    using Rune = char32_t;
-    using UChar = Rune;
-
-    using CChar = char;
-    using CString = const CChar*;
-    using Pointer = void*;
-
-
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined(__aarch64__)
-    using SizeType = long long;
-    using USizeType = unsigned long long;
-#else
-    using SizeType = int;
-    using USizeType = unsigned int;
-#endif
-
-    using SSize = SizeType;
-    using Size = USizeType;
-    using Hash = USizeType;
-
-#ifdef _WIN32
-#include <windows.h>
-    using Handler = HANDLE;
-#else
-    using Handler = Int32;
-#endif
-
-    template<typename T>
-    Hash hash(const T& val);
+        static Size calculateRuneLength(Byte firstByte);
+        static Rune extractRuneAt(const Byte *data, Size i);
+        static String encodeRuneToString(Rune codepoint);
+    };
 }

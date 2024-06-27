@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-#include <Cedar/Core/Exception.h>
+#include <Cedar/Core/Exceptions/Exception.h>
 #include <Cedar/Core/Memory.h>
 #include <Cedar/Core/String.h>
 
@@ -34,6 +34,9 @@ public:
 };
 
 Exception::Exception(const String& message)
+        : pImpl(new Impl(message)) {}
+
+Exception::Exception(CString message)
         : pImpl(new Impl(message)) {}
 
 Exception::~Exception() {
