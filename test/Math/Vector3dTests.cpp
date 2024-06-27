@@ -120,12 +120,12 @@ namespace Cedar::Core::Math {
     TEST(Vector3dTest, EqualOp) {
         Math::Vec3d v3d_0(-2.4, 6.7, 2.4);
         Math::Vec3d v3d_1(-12.73, -7.31, 84.9);
-        bool temp = v3d_0 == v3d_1;
+        Boolean temp = v3d_0 == v3d_1;
         EXPECT_FALSE(temp);
 
         Math::Vec3d v3d_2(-2.4, 6.7, 25.1);
         Math::Vec3d v3d_3(-2.4, 6.7, 25.1);
-        bool temp_1 = v3d_2 == v3d_3;
+        Boolean temp_1 = v3d_2 == v3d_3;
         EXPECT_TRUE(temp_1);
     }
 
@@ -133,12 +133,12 @@ namespace Cedar::Core::Math {
     TEST(Vector3dTest, InverseEqualOp) {
         Math::Vec3d v3d_0(-2.4, 6.7, 2.4);
         Math::Vec3d v3d_1(-12.73, -7.31, 84.9);
-        bool temp = v3d_0 != v3d_1;
+        Boolean temp = v3d_0 != v3d_1;
         EXPECT_TRUE(temp);
 
         Math::Vec3d v3d_2(-2.4, 6.7, 25.1);
         Math::Vec3d v3d_3(-2.4, 6.7, 25.1);
-        bool temp_1 = v3d_2 != v3d_3;
+        Boolean temp_1 = v3d_2 != v3d_3;
         EXPECT_FALSE(temp_1);
     }
 }

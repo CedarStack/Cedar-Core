@@ -21,33 +21,36 @@
  * SOFTWARE.
  */
 
-#include <Cedar/Core/Memory.h>
+#include <gtest/gtest.h>
+#include <Cedar/Core/Threading/Thread.h>
 
-// NOLINTNEXTLINE
-#include <string.h>
+namespace Cedar::Core::Threading {
+    TEST(ThreadTest, ThreadExecution) {
+        std::atomic<bool> executed(false);
+        Function<void> func = [&executed]() { executed.store(true); };
+        Thread thread(func);
+        thread.start();
+        thread.join();
 
-using namespace Cedar::Core;
+        EXPECT_TRUE(executed.load());
+    }
 
-void Memory::copy(Cedar::Core::Pointer target, Cedar::Core::Pointer source, Cedar::Core::Size size) {
-    memcpy(target, source, size);
-}
+    TEST(ThreadTest, MultipleThreads) {
+        std::atomic<int> counter(0);
+        Function<void> func = [&counter]() {
+            for (int i = 0; i < 100; ++i) {
+                counter.fetch_add(1);
+            }
+        };
 
-Int32 Memory::compare(Pointer p1, Pointer p2, Size size) {
-    return memcmp(p1, p2, size);
-}
+        Thread thread1(func);
+        Thread thread2(func);
 
-void Memory::copyCString(Cedar::Core::CString target, Cedar::Core::CString source) {
-    strcpy((CChar*) target, source);
-}
+        thread1.start();
+        thread2.start();
+        thread1.join();
+        thread2.join();
 
-Size Memory::calcCStringLength(Cedar::Core::CString string) {
-    return strlen(string);
-}
-
-Pointer Memory::allocate(Size size) {
-    return new Byte[size]();
-}
-
-void Memory::release(Pointer memory) {
-    delete[] static_cast<Byte*>(memory);
+        EXPECT_EQ(counter.load(), 200);
+    }
 }

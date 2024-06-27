@@ -30,7 +30,7 @@ using namespace Cedar::Core;
 class Exception::Impl {
 public:
     String message;
-    explicit Impl(String msg) : message(Memory::move(msg)) {}
+    explicit Impl(String msg) : message(TypeTraits::move(msg)) {}
 };
 
 Exception::Exception(const String& message)
@@ -47,6 +47,6 @@ String Exception::getMessage() const noexcept {
     return pImpl->message;
 }
 
-const char* Exception::what() const noexcept {
+CString Exception::what() const noexcept {
     return pImpl->message.rawString();
 }

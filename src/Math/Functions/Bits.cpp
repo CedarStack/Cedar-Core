@@ -165,7 +165,7 @@ FractionalParts<Float32> Math::splitFractional(Float32 value) {
 FractionalParts<Float64> Math::splitFractional(Float64 value) {
     FloatBits64 u = { value };
     Int32 exponent = static_cast<Int32>(u.intValue >> 52) & 0x7FF;
-    int e = exponent - 0x3FF;
+    Int32 e = exponent - 0x3FF;
     FractionalParts<Float64> result{};
 
     if (e >= 52) {

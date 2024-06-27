@@ -42,7 +42,7 @@ struct String::Impl {
 
     Impl() : size(0), runeCount(0) {}
 
-    Impl(const char* str, Size len) : size(len), runeCount(0) {
+    Impl(CString str, Size len) : size(len), runeCount(0) {
         str = str ? str : "";
         data.reset(static_cast<Byte *>(Memory::allocate(len + 1)));
         Memory::copy(data.get(), (Byte *) str, len);
@@ -216,7 +216,7 @@ String String::replace(const String& oldStr, const String& newStr) const {
 
     String result;
     Size start = 0;
-    int foundPos = this->find(oldStr);
+    Size foundPos = this->find(oldStr);
 
     while (foundPos != NPos) {
         result = result + this->substring(start, foundPos - start);
@@ -256,7 +256,7 @@ List<String> String::split(const String& delimiter) const {
     List<String> result;
     Size delimiterLength = delimiter.pImpl->size;
     if (delimiterLength == 0) {
-        result.append(String(reinterpret_cast<const char*>(pImpl->data.get()), pImpl->size));
+        result.append(String(reinterpret_cast<CString>(pImpl->data.get()), pImpl->size));
         return result;
     }
 
@@ -308,16 +308,16 @@ SSize String::find(const String& substring, SSize startIndex) const {
         i += Unicode::calculateRuneLength(substring.pImpl->data[i]);
     }
 
-    int thisSize = runes.size();
-    int subSize = subRunes.size();
+    Size thisSize = runes.size();
+    Size subSize = subRunes.size();
 
     if (subSize > thisSize) return NPos;
 
     if (startIndex < 0) {
         startIndex = thisSize + startIndex;
-        for (int i = startIndex; i >= 0; --i) {
-            bool found = true;
-            for (int j = 0; j < subSize; ++j) {
+        for (Size i = startIndex; i >= 0; --i) {
+            Boolean found = true;
+            for (Size j = 0; j < subSize; ++j) {
                 if (i + j >= thisSize || runes[i + j] != subRunes[j]) {
                     found = false;
                     break;
@@ -330,9 +330,9 @@ SSize String::find(const String& substring, SSize startIndex) const {
             return NPos;
         }
 
-        for (int i = startIndex; i <= thisSize - subSize; ++i) {
-            bool found = true;
-            for (int j = 0; j < subSize; ++j) {
+        for (Size i = startIndex; i <= thisSize - subSize; ++i) {
+            Boolean found = true;
+            for (Size j = 0; j < subSize; ++j) {
                 if (runes[i + j] != subRunes[j]) {
                     found = false;
                     break;
@@ -393,7 +393,7 @@ Boolean String::operator==(const String& other) const {
            Memory::compare(pImpl->data.get(), other.pImpl->data.get(), pImpl->size) == 0;
 }
 
-bool String::operator!=(const String& other) const {
+Boolean String::operator!=(const String& other) const {
     this->checkValidState();
     other.checkValidState();
 

@@ -98,7 +98,7 @@ namespace Cedar::Core::Container {
             return nullptr;
         }
 
-        bool remove(const KeyType &key) {
+        Boolean remove(const KeyType &key) {
             Size index = myHash(key);
             locks[index].lock();
             HashNode<KeyType, ValueType> *node = buckets[index];
@@ -189,7 +189,7 @@ namespace Cedar::Core::Container {
                 return Pair<const KeyType &, ValueType &>(current->key, current->value);
             }
 
-            bool operator!=(const Iterator &other) const {
+            Boolean operator!=(const Iterator &other) const {
                 return current != other.current;
             }
         };

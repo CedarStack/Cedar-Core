@@ -1,0 +1,33 @@
+// Copyright (C) 2024 Cedar Community
+// This file is part of Cedar-Core, distributed under the MIT License.
+// See the LICENSE file in the project root for full license information.
+
+cc_library_headers {
+    name: "cedar_core_headers",
+    vendor_available: true,
+    export_include_dirs: ["include"],
+}
+
+cc_library_shared {
+    name: "libcedar_core",
+    vendor_available: true,
+    srcs: [
+        "src/IO/*.cpp",
+        "src/Math/Functions/*.cpp",
+        "src/Text/*.cpp",
+        "src/Text/Unicode/*.cpp",
+        "src/Threading/*.cpp",
+        "src/*.cpp"
+    ],
+    header_libs : ["cedar_core_headers"],
+    export_header_lib_headers : ["cedar_core_headers"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-fexceptions",
+    ],
+    cppflags: [
+        "-std=c++17",
+    ],
+    ldflags: [],
+}

@@ -91,8 +91,8 @@ namespace Cedar::Core {
 //            Iterator& operator++();
 //            Iterator operator++(int);
 //            Rune operator*() const ;
-//            bool operator!=(const Iterator& other) const;
-//            bool operator==(const Iterator& other) const;
+//            Boolean operator!=(const Iterator& other) const;
+//            Boolean operator==(const Iterator& other) const;
 //        private:
 //            const Byte* ptr;
 //            const Byte* end;

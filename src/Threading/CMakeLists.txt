@@ -4,4 +4,5 @@
 
 target_sources(Cedar PRIVATE
         Mutex.cpp
+        Thread.cpp
 )

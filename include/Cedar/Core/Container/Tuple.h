@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <Cedar/Core/BasicTypes.h>
+
 namespace Cedar::Core::Container {
     template<typename... Ts>
     class Tuple;
@@ -38,7 +40,7 @@ namespace Cedar::Core::Container {
 
         T getValue() { return m_value; }
 
-        template<int index>
+        template<Size index>
         auto get() {
             if constexpr (index == 0) {
                 return m_value;

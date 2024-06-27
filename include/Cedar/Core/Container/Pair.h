@@ -37,7 +37,7 @@ namespace Cedar::Core::Container {
 
         Pair(const T1& x, const T2& y) : first(x), second(y) {}
         Pair(const Pair& other) : first(other.first), second(other.second) {}
-        Pair(Pair&& other) noexcept : first(Memory::move(other.first)), second(Memory::move(other.second)) {}
+        Pair(Pair&& other) noexcept : first(TypeTraits::move(other.first)), second(TypeTraits::move(other.second)) {}
 
         Pair& operator=(const Pair& other) {
             if (this != &other) {
@@ -49,8 +49,8 @@ namespace Cedar::Core::Container {
 
         Pair& operator=(Pair&& other) noexcept {
             if (this != &other) {
-                first = Memory::move(other.first);
-                second = Memory::move(other.second);
+                first = TypeTraits::move(other.first);
+                second = TypeTraits::move(other.second);
             }
             return *this;
         }
